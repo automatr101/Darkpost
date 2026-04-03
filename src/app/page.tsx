@@ -1,101 +1,225 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import FeedClient from '@/components/FeedClient';
+import Link from 'next/link';
+import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    };
+    fetchUser();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.refresh();
+  };
+
+  const desktopNavItems = [
+    { label: 'Home', icon: <HomeIcon size={22} />, href: '/', show: true, active: true },
+    { label: 'Archive', icon: <Hash size={22} />, href: '/archive', show: true, active: false },
+    { label: 'Profile', icon: <User size={22} />, href: '/profile', show: !!user, active: false },
+    { label: 'Login', icon: <LogIn size={22} />, href: '/login', show: !user, active: false },
+    { label: 'Join', icon: <UserPlus size={22} />, href: '/signup', show: !user, active: false },
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row justify-center" style={{ backgroundColor: '#131313' }}>
+      {/* Premium Desktop Sidebar (Twitter Style) */}
+      <aside
+        className="hidden md:flex flex-col w-64 lg:w-72 h-screen sticky top-0 p-6 pr-8 border-r border-white/5"
+      >
+        <Link href="/" className="mb-10 px-4 group">
+          <h1 className="font-syne font-extrabold text-2xl tracking-tighter transition-all group-hover:scale-105" style={{ color: '#F0ECE3' }}>
+            DARK<span style={{ color: '#ff535b' }}>.</span>POST
+          </h1>
+        </Link>
+        
+        <nav className="flex flex-col gap-1 mb-6">
+          {desktopNavItems.filter(item => item.show).map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 font-syne font-bold uppercase tracking-widest text-[13px] ${
+                item.active 
+                  ? "bg-white/10 text-white border border-white/10" 
+                  : "text-[#4A4A4A] hover:bg-white/5 hover:text-[#6B6B6B]"
+              }`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          ))}
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 font-syne font-bold uppercase tracking-widest text-[13px] text-[#4A4A4A] hover:bg-[#ff535b]/10 hover:text-[#ff535b]"
+            >
+              <LogOut size={22} />
+              Exit
+            </button>
+          )}
+        </nav>
+
+        <Link
+          href="/compose"
+          className="flex items-center justify-center gap-3 w-full font-syne font-extrabold text-center transition-all active:scale-[0.97] hover:shadow-[0_0_30px_rgba(255,83,91,0.3)] shadow-lg group mb-8"
+          style={{
+            backgroundColor: '#ff535b',
+            color: '#F0ECE3',
+            padding: '16px',
+            borderRadius: '100px',
+            fontSize: '14px',
+            textTransform: 'uppercase',
+          }}
+        >
+          <Plus size={20} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
+          Confess
+        </Link>
+
+        {/* User Info Section if Logged In */}
+        {user && (
+          <div className="px-4 py-3 flex items-center gap-3 border border-white/5 rounded-2xl bg-white/5 mb-6">
+             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff535b] to-[#1c1b1b] flex items-center justify-center text-[10px]">
+                👻
+             </div>
+             <div className="flex-1 overflow-hidden">
+                <p className="font-syne font-bold text-[11px] text-white truncate uppercase tracking-tight">Active Soul</p>
+                <p className="font-inter text-[9px] text-[#6B6B6B] truncate">{user.email}</p>
+             </div>
+          </div>
+        )}
+
+        {/* Footer in Sidebar */}
+        <div className="mt-auto px-4 pb-4">
+           <div className="p-4 rounded-2xl bg-[#1c1b1b]/50 border border-white/5 backdrop-blur-sm">
+             <div className="flex items-center gap-2 mb-2">
+               <Ghost size={14} className="text-[#ff535b]" />
+               <p className="font-syne font-bold text-[10px] text-[#6B6B6B] uppercase tracking-widest">Enclave Status</p>
+             </div>
+             <p className="font-inter text-[12px] text-[#353534] leading-relaxed italic">
+               &ldquo;Your identity stays buried.&rdquo;
+             </p>
+           </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-2xl flex flex-col min-h-screen md:mx-4">
+        <div
+          className="w-full max-w-2xl min-h-screen"
+          style={{
+            borderLeft: '1px solid #1c1b1b',
+            borderRight: '1px solid #1c1b1b',
+          }}
+        >
+          {/* Mobile Header */}
+          <header
+            className="md:hidden sticky top-0 z-30 flex items-center justify-center p-4 border-b border-white/5"
+            style={{
+              backgroundColor: 'rgba(19,19,19,0.85)',
+              backdropFilter: 'blur(20px)',
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <h1 className="font-syne font-extrabold text-xl tracking-tight" style={{ color: '#F0ECE3' }}>
+              DARK<span style={{ color: '#ff535b' }}>.</span>POST
+            </h1>
+          </header>
+
+          <FeedClient />
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      {/* Desktop Right Sidebar - Hidden on Tablets/Mobile */}
+      <aside className="hidden lg:flex flex-col w-[350px] h-screen sticky top-0 p-6 pl-8">
+        <div className="bg-[#1c1b1b] border border-white/5 rounded-3xl p-6 mb-8">
+          <h2 className="font-syne font-extrabold text-lg uppercase tracking-tight mb-6 flex items-center gap-3">
+            <Flame size={20} className="text-[#ff535b]" />
+            Trending Shadows
+          </h2>
+          <div className="flex flex-col gap-6">
+            {[
+              { category: 'LOVE', label: '#HeartbreakHotel', user: '2.4k Souls' },
+              { category: 'WORK', label: '#BossFromHell', user: '1.2k Souls' },
+              { category: 'SCHOOL', label: '#CheatingArchived', user: '850 Souls' },
+              { category: 'FAMILY', label: '#InheritanceWar', user: '2.1k Souls' },
+            ].map((item) => (
+              <div key={item.label} className="group cursor-pointer">
+                <p className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest mb-1 group-hover:text-[#ff535b] transition-colors">
+                  {item.category}
+                </p>
+                <p className="font-syne font-extrabold text-[15px] text-[#F0ECE3] mb-1">
+                  {item.label}
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <Ghost size={10} className="text-[#353534]" />
+                  <span className="font-inter font-medium" style={{ fontSize: '13px', color: '#e5e2e1' }}>
+                    {item.user}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-auto pt-12 pb-8 border-t border-white/5">
+          <div className="flex gap-4 flex-wrap mb-4" style={{ fontSize: '11px', color: '#353534' }}>
+            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">Manifest</Link>
+            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">Covenant</Link>
+            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">The Void</Link>
+          </div>
+          <p className="font-inter" style={{ fontSize: '10px', color: '#353534', opacity: 0.5 }}>
+            © 2026 DARKPOST INC. <br/> ANONYMITY IS SACRED.
+          </p>
+        </div>
+      </aside>
+
+      {/* Premium Mobile Bottom Nav (Twitter Style) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] bg-[#131313]/90 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <Link href="/" className="flex flex-col items-center gap-1.5 p-2 text-white">
+          <HomeIcon size={24} />
+          <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Home</span>
+        </Link>
+        <Link href="/archive" className="flex flex-col items-center gap-1.5 p-2 text-[#6B6B6B]">
+          <Hash size={24} />
+          <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Void</span>
+        </Link>
+        
+        <Link href="/compose" className="p-4 bg-[#ff535b] text-white rounded-2xl shadow-xl shadow-[#ff535b]/30 -translate-y-5 border-4 border-[#131313]">
+          <Plus size={28} strokeWidth={3} />
+        </Link>
+
+        {user ? (
+          <Link href="/profile" className="flex flex-col items-center gap-1.5 p-2 text-[#6B6B6B]">
+            <User size={24} />
+            <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Soul</span>
+          </Link>
+        ) : (
+          <Link href="/login" className="flex flex-col items-center gap-1.5 p-2 text-[#6B6B6B]">
+            <LogIn size={24} />
+            <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Auth</span>
+          </Link>
+        )}
+      </nav>
     </div>
   );
 }
