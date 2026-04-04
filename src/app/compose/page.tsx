@@ -322,18 +322,18 @@ export default function ComposePage() {
                 >
                   ℹ️ Voice posts aren&apos;t supported on this browser. Try Chrome or Safari.
                 </div>
-              ) : recordedBlob ? (
+                ) : recordedBlob ? (
                 <div className="w-full">
-                  {/* Playback waveform */}
+                  {/* Waveform player */}
                   <div
-                    className="flex items-center gap-[2px] h-16 w-full px-4 mb-4 relative"
+                    className="flex items-center gap-[2px] h-16 w-full mb-4 relative overflow-hidden"
                     style={{ backgroundColor: '#0e0e0e', borderRadius: '12px', padding: '16px' }}
                   >
-                    <button 
-                       onClick={toggleReviewPlayback} 
-                       className="mr-3 w-10 h-10 flex items-center justify-center rounded-full bg-[#ff535b] text-white shadow-lg active:scale-95 transition-all outline-none"
+                    <button
+                      onClick={toggleReviewPlayback}
+                      className="mr-3 w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-[#ff535b] text-white shadow-lg active:scale-95 transition-all outline-none"
                     >
-                       {isPlayingReview ? '⏸' : '▶'}
+                      {isPlayingReview ? '⏸' : '▶'}
                     </button>
                     {waveformData.slice(0, 60).map((v, i) => (
                       <div
@@ -341,27 +341,68 @@ export default function ComposePage() {
                         className="flex-1 rounded-full transition-all duration-75"
                         style={{
                           backgroundColor: '#E63946',
-                          height: `${v * 100}%`,
+                          height: `${Math.max(5, v * 100)}%`,
                           minHeight: '3px',
                         }}
                       />
                     ))}
                   </div>
-                  <p className="font-inter text-center mb-4" style={{ color: '#6B6B6B', fontSize: '13px' }}>
-                    0:{Math.floor(recordingTime).toString().padStart(2, '0')} recorded
+
+                  <p className="font-inter text-center mb-5" style={{ color: '#6B6B6B', fontSize: '13px' }}>
+                    0:{Math.floor(recordingTime).toString().padStart(2, '0')} recorded &mdash; review before posting
                   </p>
-                  <button
-                    onClick={() => {
-                       if (reviewAudioRef.current) reviewAudioRef.current.pause();
-                       setIsPlayingReview(false);
-                       reviewAudioRef.current = null;
-                       resetRecording();
-                    }}
-                    className="w-full font-inter font-medium py-3 rounded-xl transition-colors"
-                    style={{ backgroundColor: '#1c1b1b', color: '#9A9A9A', fontSize: '14px' }}
-                  >
-                    🔄 Re-record
-                  </button>
+
+                  {/* Action row */}
+                  <div className="flex flex-col gap-2">
+                    {/* Listen / Pause toggle */}
+                    <button
+                      onClick={toggleReviewPlayback}
+                      className="w-full font-inter font-medium py-3 rounded-xl transition-all active:scale-[0.98]"
+                      style={{
+                        backgroundColor: isPlayingReview ? '#1c1b1b' : '#ff535b18',
+                        border: '1px solid',
+                        borderColor: isPlayingReview ? 'transparent' : '#ff535b40',
+                        color: isPlayingReview ? '#9A9A9A' : '#ff535b',
+                        fontSize: '14px',
+                      }}
+                    >
+                      {isPlayingReview ? '⏸ Pause Playback' : '▶ Listen Again'}
+                    </button>
+
+                    {/* Re-record */}
+                    <button
+                      onClick={() => {
+                        if (reviewAudioRef.current) reviewAudioRef.current.pause();
+                        setIsPlayingReview(false);
+                        reviewAudioRef.current = null;
+                        resetRecording();
+                      }}
+                      className="w-full font-inter font-medium py-3 rounded-xl transition-all active:scale-[0.98]"
+                      style={{ backgroundColor: '#1c1b1b', color: '#9A9A9A', fontSize: '14px', border: '1px solid transparent' }}
+                    >
+                      🔄 Re-record
+                    </button>
+
+                    {/* Discard & Leave */}
+                    <button
+                      onClick={() => {
+                        if (reviewAudioRef.current) reviewAudioRef.current.pause();
+                        setIsPlayingReview(false);
+                        reviewAudioRef.current = null;
+                        resetRecording();
+                        router.back();
+                      }}
+                      className="w-full font-inter font-medium py-3 rounded-xl transition-all active:scale-[0.98]"
+                      style={{
+                        backgroundColor: '#1a0b0b',
+                        border: '1px solid #ff535b20',
+                        color: '#8a3a3a',
+                        fontSize: '14px',
+                      }}
+                    >
+                      🗑 Discard & Leave
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <>
