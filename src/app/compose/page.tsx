@@ -200,7 +200,7 @@ export default function ComposePage() {
             post_type: 'voice',
             voice_url: filename,
             waveform_data: trimmed,
-            duration_seconds: recordingTime,
+            duration_seconds: Math.round(recordingTime),
             is_anon: isAnon,
             category_id: categoryId,
           }),
