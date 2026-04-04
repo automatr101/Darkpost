@@ -320,7 +320,7 @@ export default function ComposePage() {
                   className="font-inter text-center px-4 py-3 rounded-xl"
                   style={{ backgroundColor: '#1c1b1b', color: '#9A9A9A', fontSize: '14px' }}
                 >
-                  ℹ️ Voice posts aren't supported on this browser. Try Chrome or Safari.
+                  ℹ️ Voice posts aren&apos;t supported on this browser. Try Chrome or Safari.
                 </div>
               ) : recordedBlob ? (
                 <div className="w-full">

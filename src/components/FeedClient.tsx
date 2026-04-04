@@ -107,6 +107,7 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
     setCursor(null);
     setHasMore(true);
     fetchPosts(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory, sort, postType]);
 
   useEffect(() => {

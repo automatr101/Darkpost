@@ -53,9 +53,11 @@ export function Particles({
     }
   }, [dpr]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const initCanvas = useCallback(() => {
     resizeCanvas();
     drawParticles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resizeCanvas]);
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export function Particles({
     return () => {
       window.removeEventListener('resize', initCanvas);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initCanvas]);
 
   useEffect(() => {
