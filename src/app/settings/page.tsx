@@ -52,6 +52,16 @@ export default function SettingsPage() {
     getProfile();
   }, [supabase, router]);
 
+  // Sanitize username: strip @, replace spaces with _, remove invalid chars, lowercase
+  function sanitizeUsername(raw: string) {
+    return raw
+      .replace(/^@+/, '')          // strip leading @
+      .replace(/\s+/g, '_')        // spaces → underscores
+      .replace(/[^a-z0-9_]/g, '')  // remove anything not a-z 0-9 _
+      .toLowerCase()
+      .slice(0, 30);               // max 30 chars
+  }
+
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -59,19 +69,33 @@ export default function SettingsPage() {
     setSuccess('');
     if (!user || !profile) { setSaving(false); return; }
 
+    // Client-side validation
+    const cleanUsername = sanitizeUsername(profile.username);
+    if (!cleanUsername || cleanUsername.length < 3) {
+      setError('Frequency must be at least 3 characters (letters, numbers, underscores only).');
+      setSaving(false);
+      return;
+    }
+
     const { error: updateError } = await supabase
       .from('users')
       .upsert({
         id: user.id,
         display_name: profile.display_name,
-        username: profile.username.toLowerCase(),
+        username: cleanUsername,
         bio: profile.bio,
         updated_at: new Date().toISOString()
       });
 
     if (updateError) {
-      setError(updateError.message);
+      if (updateError.message.includes('username_check') || updateError.message.includes('constraint')) {
+        setError('Frequency can only contain lowercase letters, numbers, and underscores (no spaces or special characters).');
+      } else {
+        setError(updateError.message);
+      }
     } else {
+      // Keep the cleaned username in state
+      setProfile(p => p ? { ...p, username: cleanUsername } : p);
       setSuccess('Your soul record has been updated.');
       setTimeout(() => setSuccess(''), 3000);
     }
@@ -127,11 +151,13 @@ export default function SettingsPage() {
                        <div className="space-y-2">
                           <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Frequency (@)</label>
                           <input 
-                             value={profile?.username || ''}
-                             onChange={(e) => setProfile(p => p ? {...p, username: e.target.value.toLowerCase()} : p)}
-                             placeholder="shadow_drift"
-                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]"
-                          />
+                           value={profile?.username || ''}
+                           onChange={(e) => setProfile(p => p ? {...p, username: sanitizeUsername(e.target.value)} : p)}
+                           placeholder="shadow_drift"
+                           maxLength={30}
+                           className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]"
+                        />
+                        <p className="font-inter text-[10px] text-[#4A4A4A] ml-1">lowercase · letters, numbers, underscores only</p>
                        </div>
                     </div>
 
