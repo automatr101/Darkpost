@@ -30,6 +30,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = useState<'replies' | 'stats'>('replies');
   const [echoText, setEchoText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState<import('@supabase/supabase-js').User | null>(null);
   
   const supabase = createClient();
 
@@ -50,6 +51,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
 
       // Check if owner or unlocked for current user
       const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) setCurrentUser(session.user);
       if (session?.user && postData) {
         const isMine = postData.user_id === session.user.id;
         
@@ -167,6 +169,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
              <PostCard 
                post={post} 
                isUnlocked={isUnlocked} 
+               currentUser={currentUser}
                onDelete={() => window.location.href = '/'}
              />
            )}
