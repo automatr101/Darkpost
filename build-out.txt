@@ -1,0 +1,65 @@
+﻿
+> darkpost@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/layout.tsx
+36:9  Warning: A font-display parameter is missing (adding `&display=optional` is recommended). See: https://nextjs.org/docs/messages/google-font-display  @next/next/google-font-display
+36:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+./src/app/posts/[id]/page.tsx
+75:6  Warning: React Hook useEffect has a missing dependency: 'fetchReplies'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/FeedClient.tsx
+110:6  Warning: React Hook useEffect has a missing dependency: 'fetchPosts'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/Particles.tsx
+59:6  Warning: React Hook useCallback has a missing dependency: 'drawParticles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+72:6  Warning: React Hook useEffect has a missing dependency: 'animate'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/16) ...
+   Generating static pages (4/16) 
+   Generating static pages (8/16) 
+   Generating static pages (12/16) 
+ Γ£ô Generating static pages (16/16)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Γöî Γùï /                                    8.74 kB         227 kB
+Γö£ Γùï /_not-found                          873 B          88.2 kB
+Γö£ Γùï /about                               2.94 kB         141 kB
+Γö£ ╞Æ /api/categories                      0 B                0 B
+Γö£ ╞Æ /api/feed                            0 B                0 B
+Γö£ ╞Æ /api/posts                           0 B                0 B
+Γö£ ╞Æ /api/posts/[id]                      0 B                0 B
+Γö£ ╞Æ /api/posts/[id]/replies              0 B                0 B
+Γö£ ╞Æ /api/posts/[id]/screenshot           0 B                0 B
+Γö£ ╞Æ /api/posts/[id]/unlock               0 B                0 B
+Γö£ Γùï /archive                             2.71 kB         160 kB
+Γö£ ╞Æ /auth/callback                       0 B                0 B
+Γö£ Γùï /compose                             5.38 kB         205 kB
+Γö£ Γùï /login                               3.37 kB         203 kB
+Γö£ ╞Æ /posts/[id]                          3.71 kB         222 kB
+Γö£ Γùï /profile                             2.85 kB         221 kB
+Γö£ Γùï /settings                            4.52 kB         162 kB
+Γöö Γùï /signup                              3.63 kB         203 kB
++ First Load JS shared by all            87.4 kB
+  Γö£ chunks/117-c86a41b869f6b521.js       31.7 kB
+  Γö£ chunks/fd9d1056-6922f449a204c2cc.js  53.6 kB
+  Γöö other shared chunks (total)          1.99 kB
+
+
+╞Æ Middleware                             79.5 kB
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

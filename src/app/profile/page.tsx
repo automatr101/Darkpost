@@ -5,23 +5,21 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  User, 
   Settings, 
   Flame, 
   Camera, 
   Ghost, 
   ArrowLeft, 
   Zap, 
-  Clock, 
   ShieldAlert 
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
-import type { Post } from '@/lib/types';
+import type { Post, Profile } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'posts' | 'saved'>('posts');
@@ -115,7 +113,7 @@ export default function ProfilePage() {
           </div>
 
           <p className="font-inter text-[#6B6B6B] leading-relaxed mb-8 max-w-lg text-[13px] md:text-[14px]">
-             &ldquo;In the end, we are all just archives of the things we didn't say. 
+             &ldquo;In the end, we are all just archives of the things we didn&apos;t say. 
              Buried deep beneath the digital soil.&rdquo;
           </p>
 

@@ -3,20 +3,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   ArrowLeft, 
   Flag, 
   MoreHorizontal, 
-  Clock, 
-  Ghost, 
-  MessageCircle, 
-  Lock,
-  Camera,
   Flame,
-  Zap,
   Info,
-  Plus
+  Plus,
+  Ghost,
+  MessageCircle,
+  Lock,
+  Camera
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
 import type { Post } from '@/lib/types';
@@ -25,7 +23,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 export default function PostDetailPage({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post | null>(null);
-  const [replies, setReplies] = useState<any[]>([]);
+  const [replies, setReplies] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isBurnt, setIsBurnt] = useState(false);
@@ -98,7 +96,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
         setIsUnlocked(true);
         fetchReplies();
       }
-    } catch (err) {}
+    } catch {}
   };
 
   const handleEchoSubmit = async () => {

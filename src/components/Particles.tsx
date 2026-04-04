@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 
 interface ParticleProps {
   className?: string;
@@ -9,6 +9,19 @@ interface ParticleProps {
   ease?: number;
   refresh?: boolean;
   color?: string;
+}
+
+interface Circle {
+  x: number;
+  y: number;
+  translateX: number;
+  translateY: number;
+  size: number;
+  alpha: number;
+  targetAlpha: number;
+  dx: number;
+  dy: number;
+  magnetism: number;
 }
 
 export function Particles({
@@ -22,11 +35,28 @@ export function Particles({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>(null);
-  const circles = useRef<any[]>([]);
-  const mousePosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const circles = useRef<Circle[]>([]);
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
   const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+
+  const resizeCanvas = useCallback(() => {
+    if (canvasContainerRef.current && canvasRef.current && context.current) {
+      circles.current.length = 0;
+      canvasSize.current.w = canvasContainerRef.current.offsetWidth;
+      canvasSize.current.h = canvasContainerRef.current.offsetHeight;
+      canvasRef.current.width = canvasSize.current.w * dpr;
+      canvasRef.current.height = canvasSize.current.h * dpr;
+      canvasRef.current.style.width = `${canvasSize.current.w}px`;
+      canvasRef.current.style.height = `${canvasSize.current.h}px`;
+      context.current.scale(dpr, dpr);
+    }
+  }, [dpr]);
+
+  const initCanvas = useCallback(() => {
+    resizeCanvas();
+    drawParticles();
+  }, [resizeCanvas]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -39,41 +69,23 @@ export function Particles({
     return () => {
       window.removeEventListener('resize', initCanvas);
     };
-  }, []);
+  }, [initCanvas]);
 
   useEffect(() => {
     initCanvas();
-  }, [refresh]);
-
-  const initCanvas = () => {
-    resizeCanvas();
-    drawParticles();
-  };
+  }, [refresh, initCanvas]);
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (canvasContainerRef.current) {
-      const rect = canvasContainerRef.current.getBoundingClientRect();
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
       const { w, h } = canvasSize.current;
       const x = e.clientX - rect.left - w / 2;
       const y = e.clientY - rect.top - h / 2;
       const inside = x < w / 2 && x > -w / 2 && y < h / 2 && y > -h / 2;
       if (inside) {
-        mousePosition.current.x = e.clientX - rect.left;
-        mousePosition.current.y = e.clientY - rect.top;
+        mouse.current.x = x;
+        mouse.current.y = y;
       }
-    }
-  };
-
-  const resizeCanvas = () => {
-    if (canvasContainerRef.current && canvasRef.current && context.current) {
-      circles.current.length = 0;
-      canvasSize.current.w = canvasContainerRef.current.offsetWidth;
-      canvasSize.current.h = canvasContainerRef.current.offsetHeight;
-      canvasRef.current.width = canvasSize.current.w * dpr;
-      canvasRef.current.height = canvasSize.current.h * dpr;
-      canvasRef.current.style.width = `${canvasSize.current.w}px`;
-      canvasRef.current.style.height = `${canvasSize.current.h}px`;
-      context.current.scale(dpr, dpr);
     }
   };
 
@@ -93,7 +105,7 @@ export function Particles({
 
   const rgb = hexToRgb(color);
 
-  const drawCircle = (circle: any, update = false) => {
+  const drawCircle = (circle: Circle, update = false) => {
     if (context.current) {
       const { x, y, translateX, translateY, size, alpha } = circle;
       context.current.translate(translateX, translateY);
@@ -131,7 +143,7 @@ export function Particles({
 
   const animate = () => {
     clearContext();
-    circles.current.forEach((circle: any, i: number) => {
+    circles.current.forEach((circle: Circle, i: number) => {
       // Handle the alpha value
       const edge = [
         circle.x + circle.translateX - circle.size,

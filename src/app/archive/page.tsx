@@ -4,12 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, 
   Search, 
   Flame, 
   Camera, 
   Ghost, 
-  MessageCircle, 
   TrendingUp, 
   Clock, 
   Filter,
@@ -18,7 +16,6 @@ import {
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
 import type { Post, Category } from '@/lib/types';
-import { cn } from '@/lib/utils';
 
 export default function ArchiveExplorePage() {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -9,15 +9,15 @@ import { cn } from '@/lib/utils';
 import { Search, SlidersHorizontal, Sparkles, TrendingUp, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
-export default function FeedClient() {
-  const [user, setUser] = useState<any>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[] }) {
+  const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [sort, setSort] = useState<'new' | 'trending'>('new');
-  const [postType, setPostType] = useState<'all' | 'text' | 'voice'>('all');
+  const [postType] = useState<'text' | 'voice'>('text');
   const [cursor, setCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ export default function FeedClient() {
         // Final fallback to getUser with a silent catch for lock theft
         const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
         setUser(user);
-      } catch (err) {
+      } catch {
         console.warn('Silent auth lock error — continuing as guest');
       }
     };

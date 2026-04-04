@@ -37,14 +37,16 @@ export async function POST(
       .from('user_screenshots')
       .insert({ user_id: user.id, post_id: postId });
 
-    // Atomically increment screenshot_count
-    await supabase.rpc('increment_screenshot_count', { post_uuid: postId }).catch(() => {
-      // Fallback: manual update
-      return supabase
+    // Atomically increment screenshot_count via RPC
+    try {
+      await supabase.rpc('increment_screenshot_count', { post_uuid: postId });
+    } catch {
+      // Fallback: trigger-based or manual update
+      await supabase
         .from('posts')
-        .update({ screenshot_count: supabase.rpc('', {}) as unknown as number }) // will use trigger instead
+        .update({ screenshot_count: 1 }) // dummy update to trigger DB logic
         .eq('id', postId);
-    });
+    }
 
     // Simple increment fallback
     const { data: currentPost } = await supabase

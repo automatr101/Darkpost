@@ -46,7 +46,7 @@ export function SlideButton({
   // Text opacity transitions as you drag
   const opacity = useTransform(x, [0, maxTravel / 2], [1, 0]);
 
-  const handleDragEnd = async (event: any, info: any) => {
+  const handleDragEnd = async (event: MouseEvent | TouchEvent | PointerEvent, info: { offset: { x: number; y: number }; velocity: { x: number; y: number } }) => {
     if (disabled || isSuccess) return;
 
     if (info.offset.x >= maxTravel * 0.9) {

@@ -1,8 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, Unlock, Flame, MessageCircle, Send, Ghost, User, Sparkles, Camera } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, MessageCircle, Ghost, Send, Camera, Lock, Sparkles } from 'lucide-react';
 import ScreenshotCard from './ScreenshotCard';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import type { Post } from '@/lib/types';
+
+interface Reply {
+  id: string;
+  content: string;
+  created_at: string;
+  user?: { username: string; display_name: string | null; avatar_url: string | null };
+}
 
 interface PostModalProps {
   post: Post;
@@ -197,7 +206,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
                 </div>
                 <div className="text-center">
                    <h3 className="font-syne font-bold text-lg text-white mb-2 text-balance">Capture this record to reveal the Echoes</h3>
-                   <p className="text-[#6B6B6B] text-sm max-w-sm mx-auto">Snapshotted confessions revealed the community's response. Capture yours to join the circle.</p>
+                   <p className="text-[#6B6B6B] text-sm max-w-sm mx-auto">Snapshotted confessions revealed the community&apos;s response. Capture yours to join the circle.</p>
                 </div>
                 <button
                   onClick={handleScreenshotUnlock}

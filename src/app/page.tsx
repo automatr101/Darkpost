@@ -5,11 +5,10 @@ import FeedClient from '@/components/FeedClient';
 import Link from 'next/link';
 import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -145,7 +144,7 @@ export default function Home() {
             </h1>
           </header>
 
-          <FeedClient />
+          <FeedClient initialPosts={[]} />
         </div>
       </main>
 

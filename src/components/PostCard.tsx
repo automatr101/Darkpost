@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuroraBackground } from '@/components/AuroraBackground';
 import { cn } from '@/lib/utils';
 import type { Post } from '@/lib/types';
-import { Camera, Lock, Unlock, Zap, Flame, Play, Pause, Volume2, Mic, MessageCircle, Ghost } from 'lucide-react';
+import { Lock, Unlock, Zap, Flame, Play, Pause, Mic, MessageCircle, Ghost } from 'lucide-react';
 import Link from 'next/link';
 
 interface PostCardProps {
@@ -24,7 +24,7 @@ function getCategoryStyle(colorHex: string) {
   };
 }
 
-export default function PostCard({ post, onClick, onDelete, isUnlocked: externalUnlocked }: PostCardProps) {
+export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked }: PostCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [internalUnlocked, setInternalUnlocked] = useState(false);
@@ -45,8 +45,7 @@ export default function PostCard({ post, onClick, onDelete, isUnlocked: external
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(err => {
-        console.warn('Playback failed', err);
+      audioRef.current.play().catch(() => {
         setIsPlaying(false);
       });
     }
@@ -143,7 +142,7 @@ export default function PostCard({ post, onClick, onDelete, isUnlocked: external
         }
       }, 150);
 
-    } catch (err) {
+    } catch {
       setIsCapturing(false);
     }
   };
@@ -175,7 +174,9 @@ export default function PostCard({ post, onClick, onDelete, isUnlocked: external
           "group relative cursor-pointer overflow-hidden transition-all duration-500",
           "bg-[#151515] border border-white/5 hover:border-[#ff535b]/30",
           "rounded-[20px] md:rounded-[24px] p-5 md:p-6 self-stretch shadow-2xl",
+          isHovered && "shadow-[0_0_40px_rgba(255,83,91,0.05)]",
           isCapturing && "brightness-150 scale-[1.02]",
+          isDeleting && "opacity-50 pointer-events-none",
           isUnlocked && "cursor-default border-[#ff535b]/10"
         )}
       >

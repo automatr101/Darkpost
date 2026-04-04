@@ -4,24 +4,20 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { motion } from 'framer-motion';
+import type { Profile } from '@/lib/types';
 import { 
   ArrowLeft, 
-  Settings as SettingsIcon, 
   User, 
   Shield, 
-  Bell, 
-  EyeOff, 
   Ghost, 
   LogOut,
   Save,
   Trash2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 export default function SettingsPage() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -61,6 +57,7 @@ export default function SettingsPage() {
     setSaving(true);
     setError('');
     setSuccess('');
+    if (!user || !profile) { setSaving(false); return; }
 
     const { error: updateError } = await supabase
       .from('users')
@@ -122,7 +119,7 @@ export default function SettingsPage() {
                           <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Display Alias</label>
                           <input 
                             value={profile?.display_name || ''}
-                            onChange={(e) => setProfile({...profile, display_name: e.target.value})}
+                            onChange={(e) => setProfile(p => p ? {...p, display_name: e.target.value} : p)}
                             placeholder="Ghost Walker"
                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]"
                           />
@@ -131,7 +128,7 @@ export default function SettingsPage() {
                           <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Frequency (@)</label>
                           <input 
                              value={profile?.username || ''}
-                             onChange={(e) => setProfile({...profile, username: e.target.value.toLowerCase()})}
+                             onChange={(e) => setProfile(p => p ? {...p, username: e.target.value.toLowerCase()} : p)}
                              placeholder="shadow_drift"
                              className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]"
                           />
@@ -142,7 +139,7 @@ export default function SettingsPage() {
                        <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Echo Persona (Bio)</label>
                        <textarea 
                           value={profile?.bio || ''}
-                          onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                          onChange={(e) => setProfile(p => p ? {...p, bio: e.target.value} : p)}
                           placeholder="What would your ghost say?"
                           rows={3}
                           className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a] resize-none"

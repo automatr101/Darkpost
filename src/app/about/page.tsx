@@ -57,7 +57,7 @@ export default function TheVoidPage() {
   );
 }
 
-function LegalItem({ icon: Icon, title, content }: { icon: any, title: string, content: string }) {
+function LegalItem({ icon: Icon, title, content }: { icon: import('lucide-react').LucideIcon, title: string, content: string }) {
   return (
     <motion.div 
       initial={{ opacity: 0 }}

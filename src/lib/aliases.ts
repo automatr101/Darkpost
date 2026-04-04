@@ -32,7 +32,7 @@ export function getAlias(postId: string): string {
 
   const bigInt = hash.readBigUInt64BE(0);
   const adjIndex = Number(bigInt % BigInt(ADJECTIVES.length));
-  const nounIndex = Number((bigInt >> 16n) % BigInt(NOUNS.length));
+  const nounIndex = Number((bigInt >> BigInt(16)) % BigInt(NOUNS.length));
 
   return `Anonymous ${ADJECTIVES[adjIndex]} ${NOUNS[nounIndex]}`;
 }
