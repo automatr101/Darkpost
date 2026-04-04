@@ -13,14 +13,14 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
-    return NextResponse.redirect(`${origin}/login?error=auth`);
+    return NextResponse.redirect(`${origin}/login?error=cb_fail_${encodeURIComponent(error.message)}`);
   }
 
   // If no code is present (because middleware already processed and stripped it), check if they are logged in!
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (user) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  return NextResponse.redirect(`${origin}/login?error=cb_nouser_${encodeURIComponent(userError?.message || 'nouser')}`);
 }

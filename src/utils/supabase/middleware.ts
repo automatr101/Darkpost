@@ -59,6 +59,12 @@ export async function updateSession(request: NextRequest) {
         cleanResponse.cookies.set(cookie.name, cookie.value)
       })
       return cleanResponse
+    } else {
+      const errUrl = request.nextUrl.clone()
+      errUrl.searchParams.delete('code')
+      errUrl.pathname = '/login'
+      errUrl.searchParams.set('error', 'mw_fail: ' + error.message)
+      return NextResponse.redirect(errUrl)
     }
   }
 
