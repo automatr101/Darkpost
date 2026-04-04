@@ -245,7 +245,8 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
               transition={{ delay: idx % 5 * 0.1, duration: 0.5, ease: "easeOut" }}
             >
               <PostCard
-                post={{ ...post, is_mine: post.user_id === user?.id }}
+                post={post}
+                currentUser={user}
                 onClick={() => setSelectedPost(post)}
                 onDelete={(id) => setPosts(prev => prev.filter(p => p.id !== id))}
               />

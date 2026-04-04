@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { getAlias } from '@/lib/aliases';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/feed
  * Paginated public feed. No auth required.
@@ -62,19 +64,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Mask user_id for anonymous posts, generate aliases
+  // Get logged-in user so we can mark is_mine BEFORE nulling user_id for anon posts
+  const { data: { user: authUser } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+
+  // Mask user_id for anonymous posts, generate aliases, but preserve is_mine
   const maskedPosts = (posts || []).map((post) => {
+    const isMine = !!authUser && post.user_id === authUser.id;
     if (post.is_anon) {
       return {
         ...post,
         user_id: null,
         alias: getAlias(post.id),
         user: null,
+        is_mine: isMine,
       };
     }
     return {
       ...post,
       alias: null,
+      is_mine: isMine,
     };
   });
 
