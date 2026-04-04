@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
+import { Spinner } from '@/components/Spinner';
 
 interface SlideButtonProps {
   onSuccess: () => void | Promise<void>;
@@ -11,6 +12,7 @@ interface SlideButtonProps {
   successText?: string;
   className?: string;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export function SlideButton({
@@ -19,6 +21,7 @@ export function SlideButton({
   successText = 'POSTING...',
   className,
   disabled = false,
+  isLoading = false,
 }: SlideButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -108,8 +111,10 @@ export function SlideButton({
           isSuccess ? "bg-primary-red text-white" : "bg-[#2a2a2a] text-white hover:bg-[#353534]"
         )}
       >
-        {!isSuccess ? (
+        {!isSuccess && !isLoading ? (
           <ArrowRight className="w-5 h-5 text-text-primary group-hover:text-white transition-colors" />
+        ) : isLoading ? (
+          <Spinner size="sm" />
         ) : (
           <motion.svg
             initial={{ scale: 0 }}

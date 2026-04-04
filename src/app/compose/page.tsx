@@ -519,6 +519,7 @@ export default function ComposePage() {
             <SlideButton
               onSuccess={handleSubmit}
               disabled={!canPost || loading}
+              isLoading={loading}
               text={tab === 'voice' ? 'SLIDE TO POST VOICE' : 'SLIDE TO CONFESS'}
               successText={loading ? 'POSTING...' : 'CONFESSED'}
             />

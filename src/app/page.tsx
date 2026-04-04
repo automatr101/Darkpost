@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { Spinner } from '@/components/Spinner';
 
 export default function Home() {
   const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -28,8 +30,10 @@ export default function Home() {
   }, [supabase]);
 
   const handleLogout = async () => {
+    setSigningOut(true);
     await supabase.auth.signOut();
     setUser(null);
+    setSigningOut(false);
     router.refresh();
   };
 
@@ -71,10 +75,11 @@ export default function Home() {
           {user && (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 font-syne font-bold uppercase tracking-widest text-[13px] text-[#4A4A4A] hover:bg-[#ff535b]/10 hover:text-[#ff535b]"
+              disabled={signingOut}
+              className="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 font-syne font-bold uppercase tracking-widest text-[13px] text-[#4A4A4A] hover:bg-[#ff535b]/10 hover:text-[#ff535b] disabled:opacity-50"
             >
-              <LogOut size={22} />
-              Exit
+              {signingOut ? <Spinner size="sm" /> : <LogOut size={22} />}
+              {signingOut ? 'Exiting...' : 'Exit'}
             </button>
           )}
         </nav>
