@@ -42,6 +42,28 @@ export default function ComposePage() {
     }
   }, []);
 
+  const [liveWaveform, setLiveWaveform] = useState<number[]>(Array(30).fill(0.05));
+  const [isPlayingReview, setIsPlayingReview] = useState(false);
+  const reviewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  function toggleReviewPlayback() {
+    if (!reviewAudioRef.current) {
+      if (!recordedBlob) return;
+      const audioUrl = URL.createObjectURL(recordedBlob);
+      const audio = new Audio(audioUrl);
+      audio.onended = () => setIsPlayingReview(false);
+      reviewAudioRef.current = audio;
+    }
+    
+    if (isPlayingReview) {
+      reviewAudioRef.current.pause();
+      setIsPlayingReview(false);
+    } else {
+      reviewAudioRef.current.play();
+      setIsPlayingReview(true);
+    }
+  }
+
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -100,7 +122,12 @@ export default function ComposePage() {
             const data = new Uint8Array(analyserRef.current.frequencyBinCount);
             analyserRef.current.getByteFrequencyData(data);
             const avg = data.reduce((a, b) => a + b, 0) / data.length / 255;
-            amplitudes.push(Math.max(0.05, avg));
+            const amp = Math.max(0.05, avg);
+            amplitudes.push(amp);
+            setLiveWaveform(prev => {
+              const next = [...prev.slice(1), amp];
+              return next;
+            });
           }
           return newTime;
         });
@@ -285,7 +312,7 @@ export default function ComposePage() {
             </div>
           )}
 
-          {/* Voice Compose */}
+
           {tab === 'voice' && (
             <div className="flex flex-col items-center py-8">
               {!mediaSupported ? (
@@ -293,19 +320,25 @@ export default function ComposePage() {
                   className="font-inter text-center px-4 py-3 rounded-xl"
                   style={{ backgroundColor: '#1c1b1b', color: '#9A9A9A', fontSize: '14px' }}
                 >
-                  ℹ️ Voice posts aren&apos;t supported on this browser. Try Chrome or Safari.
+                  ℹ️ Voice posts aren't supported on this browser. Try Chrome or Safari.
                 </div>
               ) : recordedBlob ? (
                 <div className="w-full">
                   {/* Playback waveform */}
                   <div
-                    className="flex items-center gap-[2px] h-16 w-full px-4 mb-4"
+                    className="flex items-center gap-[2px] h-16 w-full px-4 mb-4 relative"
                     style={{ backgroundColor: '#0e0e0e', borderRadius: '12px', padding: '16px' }}
                   >
+                    <button 
+                       onClick={toggleReviewPlayback} 
+                       className="mr-3 w-10 h-10 flex items-center justify-center rounded-full bg-[#ff535b] text-white shadow-lg active:scale-95 transition-all outline-none"
+                    >
+                       {isPlayingReview ? '⏸' : '▶'}
+                    </button>
                     {waveformData.slice(0, 60).map((v, i) => (
                       <div
                         key={i}
-                        className="flex-1 rounded-full"
+                        className="flex-1 rounded-full transition-all duration-75"
                         style={{
                           backgroundColor: '#E63946',
                           height: `${v * 100}%`,
@@ -318,7 +351,12 @@ export default function ComposePage() {
                     0:{Math.floor(recordingTime).toString().padStart(2, '0')} recorded
                   </p>
                   <button
-                    onClick={resetRecording}
+                    onClick={() => {
+                       if (reviewAudioRef.current) reviewAudioRef.current.pause();
+                       setIsPlayingReview(false);
+                       reviewAudioRef.current = null;
+                       resetRecording();
+                    }}
                     className="w-full font-inter font-medium py-3 rounded-xl transition-colors"
                     style={{ backgroundColor: '#1c1b1b', color: '#9A9A9A', fontSize: '14px' }}
                   >
@@ -327,6 +365,22 @@ export default function ComposePage() {
                 </div>
               ) : (
                 <>
+                  {/* Live visualization */}
+                  {isRecording && (
+                    <div className="flex items-center gap-[2px] h-12 w-full max-w-[200px] mb-8">
+                      {liveWaveform.map((v, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-full bg-[#ff535b] transition-all duration-100 ease-linear"
+                          style={{
+                            height: `${Math.max(5, v * 150)}%`,
+                            minHeight: '4px',
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+
                   {/* Record button */}
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
