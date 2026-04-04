@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react';
 import FeedClient from '@/components/FeedClient';
 import Link from 'next/link';
-import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame } from 'lucide-react';
+import { Home as HomeIcon, Plus, User, LogIn, Ghost, Hash, LogOut, Flame, Settings } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Spinner } from '@/components/Spinner';
 
 export default function Home() {
   const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
   const [signingOut, setSigningOut] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
 
   useEffect(() => {
@@ -197,32 +198,113 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Premium Mobile Bottom Nav (Twitter Style) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] bg-[#131313]/90 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <Link href="/" className="flex flex-col items-center gap-1.5 p-2 text-white">
-          <HomeIcon size={24} />
-          <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Home</span>
-        </Link>
-        <Link href="/archive" className="flex flex-col items-center gap-1.5 p-2 text-[#6B6B6B]">
-          <Hash size={24} />
-          <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Void</span>
-        </Link>
-        
-        <Link href="/compose" className="p-4 bg-[#ff535b] text-white rounded-2xl shadow-xl shadow-[#ff535b]/30 -translate-y-5 border-4 border-[#131313]">
-          <Plus size={28} strokeWidth={3} />
-        </Link>
+      {/* ─── Premium Mobile Bottom Nav ─── */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {/* Glow line at top */}
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-[#ff535b]/20 to-transparent" />
 
-        {user ? (
-          <Link href="/profile" className="flex flex-col items-center gap-1.5 p-2 text-[#6B6B6B]">
-            <User size={24} />
-            <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Soul</span>
+        <div
+          className="flex items-end justify-around px-1"
+          style={{
+            backgroundColor: 'rgba(10,10,10,0.97)',
+            backdropFilter: 'blur(30px)',
+            height: '72px',
+          }}
+        >
+          {/* HOME */}
+          <Link href="/" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
+            <HomeIcon
+              size={22}
+              className={pathname === '/' ? 'text-[#ff535b]' : 'text-[#555] group-active:text-white transition-colors'}
+            />
+            <span
+              className="font-syne font-bold uppercase tracking-widest"
+              style={{ fontSize: '8px', color: pathname === '/' ? '#ff535b' : '#444' }}
+            >
+              Home
+            </span>
+            {pathname === '/' && (
+              <span className="absolute bottom-[10px] w-1 h-1 rounded-full bg-[#ff535b]" />
+            )}
           </Link>
-        ) : (
-          <Link href="/login" className="flex flex-col items-center gap-1.5 p-2 text-[#6B6B6B]">
-            <LogIn size={24} />
-            <span className="font-syne font-bold text-[8px] uppercase tracking-widest">Auth</span>
+
+          {/* ARCHIVE */}
+          <Link href="/archive" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
+            <Hash
+              size={22}
+              className={pathname === '/archive' ? 'text-[#ff535b]' : 'text-[#555] group-active:text-white transition-colors'}
+            />
+            <span
+              className="font-syne font-bold uppercase tracking-widest"
+              style={{ fontSize: '8px', color: pathname === '/archive' ? '#ff535b' : '#444' }}
+            >
+              Archive
+            </span>
           </Link>
-        )}
+
+          {/* CENTER — CONFESS (elevated) */}
+          <div className="relative flex flex-col items-center" style={{ marginTop: '-28px' }}>
+            <Link
+              href="/compose"
+              className="flex items-center justify-center rounded-[20px] shadow-2xl active:scale-95 transition-transform"
+              style={{
+                width: '58px',
+                height: '58px',
+                backgroundColor: '#ff535b',
+                boxShadow: '0 0 30px rgba(255,83,91,0.5), 0 8px 24px rgba(255,83,91,0.3)',
+                border: '3px solid rgba(10,10,10,0.97)',
+              }}
+            >
+              <Plus size={28} strokeWidth={3} className="text-white" />
+            </Link>
+            <span
+              className="font-syne font-bold uppercase tracking-widest mt-1"
+              style={{ fontSize: '8px', color: '#444' }}
+            >
+              Confess
+            </span>
+          </div>
+
+          {/* SOUL / ENTER */}
+          {user ? (
+            <Link href="/profile" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
+              <User
+                size={22}
+                className={pathname === '/profile' ? 'text-[#ff535b]' : 'text-[#555] group-active:text-white transition-colors'}
+              />
+              <span
+                className="font-syne font-bold uppercase tracking-widest"
+                style={{ fontSize: '8px', color: pathname === '/profile' ? '#ff535b' : '#444' }}
+              >
+                Soul
+              </span>
+            </Link>
+          ) : (
+            <Link href="/login" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
+              <LogIn size={22} className="text-[#555] group-active:text-white transition-colors" />
+              <span className="font-syne font-bold uppercase tracking-widest" style={{ fontSize: '8px', color: '#444' }}>
+                Enter
+              </span>
+            </Link>
+          )}
+
+          {/* ENCLAVE (settings) */}
+          <Link href="/settings" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
+            <Ghost
+              size={22}
+              className={pathname === '/settings' ? 'text-[#ff535b]' : 'text-[#555] group-active:text-white transition-colors'}
+            />
+            <span
+              className="font-syne font-bold uppercase tracking-widest"
+              style={{ fontSize: '8px', color: pathname === '/settings' ? '#ff535b' : '#444' }}
+            >
+              Enclave
+            </span>
+          </Link>
+        </div>
       </nav>
     </div>
   );
