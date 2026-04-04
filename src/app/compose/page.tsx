@@ -45,7 +45,13 @@ export default function ComposePage() {
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+      const options = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? { mimeType: 'audio/webm;codecs=opus' }
+        : MediaRecorder.isTypeSupported('audio/mp4') 
+          ? { mimeType: 'audio/mp4' } 
+          : undefined;
+
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -64,8 +70,9 @@ export default function ComposePage() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        if (blob.size > 2000 * 1024) { // Increased size limit for 60s
+        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        if (blob.size > 5000 * 1024) { // Increased size limit for 60s
           setError('Recording too large. Try a shorter confession.');
           return;
         }
@@ -142,10 +149,12 @@ export default function ComposePage() {
         }
       } else if (tab === 'voice' && recordedBlob) {
         // Upload voice file to Supabase Storage
-        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
+        const mimeType = recordedBlob.type || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('mpeg') ? 'mp3' : 'webm';
+        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from('voice-posts')
-          .upload(filename, recordedBlob, { contentType: 'audio/webm' });
+          .upload(filename, recordedBlob, { contentType: mimeType });
 
         if (uploadError) {
           setError('Voice upload failed. Try again.');
