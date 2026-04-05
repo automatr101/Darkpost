@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { z } from 'zod';
+import DOMPurify from 'isomorphic-dompurify';
+import { applyRateLimit } from '@/lib/rate-limit';
+
+const replySchema = z.object({
+  content: z.string().min(1, 'Reply content is required.').max(280, 'Reply must be 280 characters or fewer.'),
+});
 
 /**
  * GET /api/posts/[id]/replies
@@ -47,15 +54,26 @@ export async function POST(
     return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { content } = body;
+  const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+  const rateLimit = applyRateLimit(`reply_create_${ip}`, 10, 60000);
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
 
-  if (!content || content.length === 0) {
-    return NextResponse.json({ error: 'Reply content is required.' }, { status: 400 });
+  let body;
+  try {
+    body = await request.json();
+  } catch(e) {
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
-  if (content.length > 280) {
-    return NextResponse.json({ error: 'Reply must be 280 characters or fewer.' }, { status: 400 });
+
+  const validated = replySchema.safeParse(body);
+  if (!validated.success) {
+    return NextResponse.json({ error: validated.error.issues[0].message }, { status: 400 });
   }
+
+  // Strict HTML sanitization
+  const content = DOMPurify.sanitize(validated.data.content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
 
   const { data: reply, error } = await supabase
     .from('replies')
