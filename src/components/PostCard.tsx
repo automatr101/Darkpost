@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuroraBackground } from '@/components/AuroraBackground';
 import { cn } from '@/lib/utils';
 import type { Post } from '@/lib/types';
-import { Lock, Unlock, Zap, Flame, Play, Pause, Mic, MessageCircle, Ghost } from 'lucide-react';
+import { Zap, Flame, Play, Pause, Mic, MessageCircle, Bookmark, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 
@@ -32,14 +32,15 @@ const STORAGE_URL = `https://rqjypyuifvezjtdxkaxn.supabase.co/storage/v1/object/
 export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked, currentUser }: PostCardProps) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const [isCapturing, setIsCapturing] = useState(false);
-  const [internalUnlocked, setInternalUnlocked] = useState(false);
-  const isUnlocked = externalUnlocked ?? internalUnlocked;
-
-  const [isBurnt, setIsBurnt] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [isDisliked, setIsDisliked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.likes_count || 0);
+  const [isBookmarked, setIsBookmarked] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const saved = JSON.parse(localStorage.getItem('dp_bookmarks') || '[]');
+    return saved.includes(post.id);
+  });
+  const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -89,16 +90,40 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
     }
   };
 
-  const handleEngagement = (e: React.MouseEvent, type: 'like' | 'dislike') => {
+  const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (type === 'like') {
-      setIsLiked(!isLiked);
-      if (isDisliked) setIsDisliked(false);
+    if (!currentUser) { router.push('/login'); return; }
+    const action = isLiked ? 'unlike' : 'like';
+    setIsLiked(!isLiked);
+    setLikeCount((c) => action === 'like' ? c + 1 : Math.max(0, c - 1));
+    await fetch(`/api/posts/${post.id}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action }),
+    }).catch(() => {});
+  };
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const saved: string[] = JSON.parse(localStorage.getItem('dp_bookmarks') || '[]');
+    if (isBookmarked) {
+      localStorage.setItem('dp_bookmarks', JSON.stringify(saved.filter((id) => id !== post.id)));
     } else {
-      setIsDisliked(!isDisliked);
-      if (isLiked) setIsLiked(false);
+      saved.push(post.id);
+      localStorage.setItem('dp_bookmarks', JSON.stringify(saved));
     }
+    setIsBookmarked(!isBookmarked);
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/posts/${post.id}`;
+    await navigator.clipboard.writeText(url).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleArchiveDeletion = async (e: React.MouseEvent) => {
@@ -122,27 +147,7 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
     }
   };
 
-  const handleSnapshot = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isUnlocked) return;
 
-    setIsCapturing(true);
-    try {
-      const res = await fetch(`/api/posts/${post.id}/unlock`, { method: 'POST' });
-      const json = await res.json();
-      setTimeout(() => {
-        setIsCapturing(false);
-        if (json.action === 'burnt') {
-          setIsBurnt(true);
-        } else {
-          setInternalUnlocked(true);
-        }
-      }, 150);
-    } catch {
-      setIsCapturing(false);
-    }
-  };
 
   const displayName = post.is_anon
     ? post.alias || 'Anonymous'
@@ -152,24 +157,10 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
     ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
     : 'just now';
 
-  if (isBurnt) {
-    return (
-      <motion.div
-        initial={{ opacity: 1, filter: 'blur(0px)' }}
-        animate={{ opacity: 0, filter: 'blur(30px)' }}
-        transition={{ duration: 1.5 }}
-        className="w-full h-32 flex flex-col items-center justify-center border border-[#ff535b]/30 rounded-[24px] bg-[#1a0c0c] p-6 text-center"
-      >
-        <Flame className="text-[#ff535b] mb-2 animate-bounce" size={24} />
-        <p className="font-syne font-bold text-[#ff535b] text-[12px] uppercase tracking-widest">
-          This soul was too heavy. It has been reduced to ashes.
-        </p>
-      </motion.div>
-    );
-  }
+
 
   return (
-    <Link href={`/posts/${post.id}`} className={cn('block', isUnlocked && 'pointer-events-none')}>
+    <Link href={`/posts/${post.id}`} className="block">
       <motion.article
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -180,9 +171,7 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
           'bg-[#151515] border border-white/5 hover:border-[#ff535b]/30',
           'rounded-[20px] md:rounded-[24px] p-5 md:p-6 self-stretch shadow-2xl',
           isHovered && 'shadow-[0_0_40px_rgba(255,83,91,0.05)]',
-          isCapturing && 'brightness-150 scale-[1.02]',
-          isDeleting && 'opacity-50 pointer-events-none',
-          isUnlocked && 'cursor-default border-[#ff535b]/10'
+          isDeleting && 'opacity-50 pointer-events-none'
         )}
       >
         {/* Aurora Background */}
@@ -190,23 +179,7 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
           <AuroraBackground />
         </div>
 
-        {/* Overlay to block link nav when unlocked */}
-        {isUnlocked && <div className="absolute inset-0 z-10 pointer-events-auto" onClick={(e) => e.stopPropagation()} />}
 
-        {/* Noise texture */}
-        <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-cover" />
-
-        {/* Shutter Flash */}
-        <AnimatePresence>
-          {isCapturing && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 bg-white"
-            />
-          )}
-        </AnimatePresence>
 
         <div className="relative z-20">
           {/* Header */}
@@ -316,63 +289,84 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
             </div>
           )}
 
-          {/* Action Bar */}
+          {/* Action Bar — 4 functional CTAs */}
           <div className="flex items-center justify-between pointer-events-auto">
-            <div className="flex gap-2 md:gap-4 items-center">
+            <div className="flex gap-1.5 md:gap-2 items-center">
+
+              {/* 🔥 Like — persists to DB */}
               <button
-                onClick={(e) => handleEngagement(e, 'like')}
+                onClick={handleLike}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-xl transition-all font-syne font-bold outline-none',
-                  isLiked ? 'bg-[#ff535b]/10 text-[#ff535b]' : 'bg-white/5 text-[#4A4A4A] hover:text-[#ff535b]'
+                  'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all font-syne font-bold outline-none',
+                  isLiked ? 'bg-[#ff535b]/10 text-[#ff535b]' : 'bg-white/5 text-[#4A4A4A] hover:text-[#ff535b] hover:bg-[#ff535b]/5'
                 )}
               >
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 flex items-center justify-center">
-                  <motion.div whileTap={{ scale: 1.4 }}>
-                    <Flame size={14} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={2.5} />
-                  </motion.div>
-                </div>
-                <span className="text-[12px] uppercase tracking-widest leading-none">
-                  {(post.likes_count || 0) + (isLiked ? 1 : 0)}
-                </span>
+                <motion.div whileTap={{ scale: 1.4 }}>
+                  <Flame size={15} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={2} />
+                </motion.div>
+                <span className="text-[11px] uppercase tracking-widest leading-none">{likeCount}</span>
               </button>
 
+              {/* 🔖 Bookmark — localStorage */}
               <button
-                onClick={(e) => handleEngagement(e, 'dislike')}
+                onClick={handleBookmark}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-xl transition-all font-syne font-bold outline-none',
-                  isDisliked ? 'bg-[#ff535b]/10 text-[#ff535b]' : 'bg-white/5 text-[#4A4A4A] hover:text-[#6B6B6B]'
+                  'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all font-syne font-bold outline-none',
+                  isBookmarked ? 'bg-[#fbbf24]/10 text-[#fbbf24]' : 'bg-white/5 text-[#4A4A4A] hover:text-[#fbbf24] hover:bg-[#fbbf24]/5'
                 )}
               >
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 flex items-center justify-center">
-                  <motion.div whileTap={{ scale: 1.4 }}>
-                    <Ghost size={14} fill={isDisliked ? 'currentColor' : 'none'} strokeWidth={2.5} />
-                  </motion.div>
-                </div>
-                <span className="text-[12px] uppercase tracking-widest leading-none">
-                  {(post.dislikes_count || 0) + (isDisliked ? 1 : 0)}
-                </span>
+                <motion.div whileTap={{ scale: 1.2 }}>
+                  <Bookmark size={15} fill={isBookmarked ? 'currentColor' : 'none'} strokeWidth={2} />
+                </motion.div>
               </button>
 
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 text-[#4A4A4A] font-syne font-bold group/stat">
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 flex items-center justify-center group-hover/stat:text-blue-400 transition-colors">
-                  <MessageCircle size={14} strokeWidth={2.5} />
-                </div>
-                <span className="text-[12px] uppercase tracking-widest leading-none">{post.reply_count || 0}</span>
-              </div>
+              {/* 💬 Comments — links to post detail */}
+              <Link
+                href={`/posts/${post.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 text-[#4A4A4A] hover:text-blue-400 hover:bg-blue-400/5 font-syne font-bold transition-all"
+              >
+                <MessageCircle size={15} strokeWidth={2} />
+                <span className="text-[11px] uppercase tracking-widest leading-none">{post.reply_count || 0}</span>
+              </Link>
+
             </div>
 
+            {/* 🔗 Share — copies link, shows toast */}
             <button
-              onClick={handleSnapshot}
+              onClick={handleShare}
               className={cn(
-                'flex items-center gap-2 md:gap-3 px-4 md:px-5 py-2.5 rounded-full transition-all duration-300 font-syne font-extrabold uppercase tracking-widest outline-none shadow-lg',
-                isUnlocked
-                  ? 'bg-[#ff535b] text-white shadow-[#ff535b]/30'
-                  : 'bg-[#1c1b1b] text-[#6B6B6B] border border-white/5 hover:bg-white/5 hover:text-white'
+                'flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 font-syne font-bold text-[10px] uppercase tracking-widest outline-none border',
+                copied
+                  ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                  : 'bg-white/5 text-[#4A4A4A] border-white/5 hover:bg-white/10 hover:text-white'
               )}
-              style={{ fontSize: '9px' }}
             >
-              {isUnlocked ? <Unlock size={14} /> : <Lock size={14} />}
-              <span className="hidden sm:inline">{isUnlocked ? 'Unlocked' : 'Snapshot'}</span>
+              <AnimatePresence mode="wait">
+                {copied ? (
+                  <motion.span
+                    key="check"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Check size={13} strokeWidth={3} />
+                    <span className="hidden sm:inline">Copied!</span>
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="share"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Share2 size={13} strokeWidth={2} />
+                    <span className="hidden sm:inline">Share</span>
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </div>
