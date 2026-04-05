@@ -26,67 +26,93 @@ const postSchema = z.object({
 export async function POST(request: NextRequest) {
   const supabase = createClient();
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-  }
-
-  // Ensure public.users row exists for legacy test accounts created before triggers were added
-  const { data: existingUser } = await supabase.from('users').select('id').eq('id', user.id).single();
-  if (!existingUser) {
-    await supabase.from('users').insert({ id: user.id, username: `user${Math.floor(Math.random() * 9000 + 1000)}` });
-  }
-
-  // Rate limiting (5 posts per minute per IP)
-  const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
-  const rateLimit = applyRateLimit(`post_create_${ip}`, 5, 60000);
-  if (!rateLimit.success) {
-    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
-  }
-
-  let body;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
-  }
-
-  const validated = postSchema.safeParse(body);
-  if (!validated.success) {
-    return NextResponse.json({ error: validated.error.issues[0].message }, { status: 400 });
-  }
-
-  let { content } = validated.data;
-  const { is_anon, category_id, post_type, voice_url, waveform_data, duration_seconds } = validated.data;
-
-  if (post_type === 'text' && content) {
-    // Strict HTML sanitization
-    content = DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
-
-    // Content moderation
-    if (containsBlockedContent(content)) {
-      return NextResponse.json({ error: 'This post contains content that violates our guidelines.' }, { status: 400 });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
     }
+
+    // Rate limiting (5 posts per minute per IP)
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const rateLimit = applyRateLimit(`post_create_${ip}`, 5, 60000);
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
+    // Ensure public.users row exists
+    // We use a separate check and insert logic here.
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error('Profile fetch error:', profileError);
+      return NextResponse.json({ error: `Profile check failed: ${profileError.message}` }, { status: 500 });
+    }
+
+    if (!profile) {
+      // Create profile if missing
+      const { error: insertProfileError } = await supabase
+        .from('users')
+        .insert({ 
+          id: user.id, 
+          username: `user${Math.floor(Math.random() * 9000 + 1000)}` 
+        });
+      
+      if (insertProfileError) {
+        console.error('Profile insert error:', insertProfileError);
+        return NextResponse.json({ error: `Failed to initialize user profile: ${insertProfileError.message}` }, { status: 500 });
+      }
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    }
+
+    const validated = postSchema.safeParse(body);
+    if (!validated.success) {
+      return NextResponse.json({ error: validated.error.issues[0].message }, { status: 400 });
+    }
+
+    let { content } = validated.data;
+    const { is_anon, category_id, post_type, voice_url, waveform_data, duration_seconds } = validated.data;
+
+    if (post_type === 'text' && content) {
+      content = DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+      if (containsBlockedContent(content)) {
+        return NextResponse.json({ error: 'This post contains content that violates our guidelines.' }, { status: 400 });
+      }
+    }
+
+    // Final Post Insert
+    const { data: post, error: insertError } = await supabase
+      .from('posts')
+      .insert({
+        user_id: user.id,
+        post_type,
+        content: post_type === 'text' ? content : null,
+        voice_url: post_type === 'voice' ? voice_url : null,
+        waveform_data: post_type === 'voice' ? waveform_data : null,
+        duration_seconds: post_type === 'voice' ? duration_seconds : null,
+        is_anon,
+        category_id: category_id || null,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Post insert error:', insertError);
+      return NextResponse.json({ error: `Database error: ${insertError.message}` }, { status: 500 });
+    }
+
+    return NextResponse.json({ data: post }, { status: 201 });
+  } catch (err: any) {
+    console.error('Unexpected post error:', err);
+    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
-
-  const { data: post, error } = await supabase
-    .from('posts')
-    .insert({
-      user_id: user.id,
-      post_type,
-      content: post_type === 'text' ? content : null,
-      voice_url: post_type === 'voice' ? voice_url : null,
-      waveform_data: post_type === 'voice' ? waveform_data : null,
-      duration_seconds: post_type === 'voice' ? duration_seconds : null,
-      is_anon,
-      category_id: category_id || null,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ data: post }, { status: 201 });
 }

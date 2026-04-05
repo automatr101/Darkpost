@@ -16,6 +16,7 @@ export default function ComposePage() {
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
 
   // Voice state
@@ -153,6 +154,7 @@ export default function ComposePage() {
 
   async function handleSubmit() {
     setError('');
+    setIsSuccess(false);
     setLoading(true);
 
     try {
@@ -214,7 +216,11 @@ export default function ComposePage() {
         }
       }
 
-      router.push('/');
+      setIsSuccess(true);
+      // Wait a moment for the user to see the success state before redirecting
+      setTimeout(() => {
+        router.push('/');
+      }, 800);
     } catch {
       setError('Something went wrong. Try again.');
     } finally {
@@ -518,10 +524,10 @@ export default function ComposePage() {
           <div className="mt-8 relative h-[60px]">
             <SlideButton
               onSuccess={handleSubmit}
-              disabled={!canPost || loading}
+              disabled={!canPost || loading || isSuccess}
               isLoading={loading}
               text={tab === 'voice' ? 'SLIDE TO POST' : 'SLIDE TO POST'}
-              successText={loading ? 'POSTING...' : 'POSTED!'}
+              successText={isSuccess ? 'POSTED!' : loading ? 'POSTING...' : 'SLIDE TO POST'}
             />
           </div>
         </div>
