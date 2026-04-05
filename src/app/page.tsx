@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import FeedClient from '@/components/FeedClient';
 import Link from 'next/link';
-import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame } from 'lucide-react';
+import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame, Settings as SettingsIcon } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 import { Spinner } from '@/components/Spinner';
@@ -239,7 +239,7 @@ export default function Home() {
               className="font-syne font-bold uppercase tracking-widest"
               style={{ fontSize: '8px', color: pathname === '/archive' ? '#ff535b' : '#444' }}
             >
-              Archive
+              Feed
             </span>
           </Link>
 
@@ -277,7 +277,7 @@ export default function Home() {
                 className="font-syne font-bold uppercase tracking-widest"
                 style={{ fontSize: '8px', color: pathname === '/profile' ? '#ff535b' : '#444' }}
               >
-                Soul
+                Profile
               </span>
             </Link>
           ) : (
@@ -291,7 +291,7 @@ export default function Home() {
 
           {/* ENCLAVE (settings) */}
           <Link href="/settings" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
-            <Ghost
+            <SettingsIcon
               size={22}
               className={pathname === '/settings' ? 'text-[#ff535b]' : 'text-[#555] group-active:text-white transition-colors'}
             />

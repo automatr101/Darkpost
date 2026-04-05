@@ -15,13 +15,17 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [sort, setSort] = useState<'new' | 'trending'>('new');
-  const [postType] = useState<'text' | 'voice' | 'all'>('all');
+  const [postType, setPostType] = useState<'text' | 'voice' | 'all'>('all');
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const supabase = createClient();
@@ -67,12 +71,13 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
     fetchUser();
   }, [supabase]);
 
-  const fetchPosts = useCallback(async (reset = false) => {
+  const fetchPosts = useCallback(async (reset = false, query = searchQuery) => {
     setLoading(true);
     const params = new URLSearchParams();
     if (activeCategory) params.set('category_slug', activeCategory);
     params.set('sort', sort);
     params.set('type', postType);
+    if (query.trim()) params.set('q', query.trim());
     if (!reset && cursor) params.set('cursor', cursor);
 
     try {
@@ -94,7 +99,8 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
     } finally {
       setLoading(false);
     }
-  }, [activeCategory, sort, postType, cursor]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory, sort, postType, cursor, searchQuery]);
 
   useEffect(() => {
     fetch('/api/categories')
@@ -107,8 +113,19 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
     setCursor(null);
     setHasMore(true);
     fetchPosts(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory, sort, postType]);
+
+  // Debounced search
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setCursor(null);
+      setHasMore(true);
+      fetchPosts(true, searchQuery);
+    }, 400);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -152,10 +169,26 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-xl bg-white/5 text-[#6B6B6B] hover:bg-white/10 transition-colors">
+            <button
+              onClick={() => {
+                setShowSearch(!showSearch);
+                setShowFilters(false);
+                setTimeout(() => searchRef.current?.focus(), 100);
+              }}
+              className={cn(
+                "p-2 rounded-xl transition-colors",
+                showSearch ? "bg-[#ff535b]/20 text-[#ff535b]" : "bg-white/5 text-[#6B6B6B] hover:bg-white/10"
+              )}
+            >
               <Search size={18} />
             </button>
-            <button className="p-2 rounded-xl bg-white/5 text-[#6B6B6B] hover:bg-white/10 transition-colors">
+            <button
+              onClick={() => { setShowFilters(!showFilters); setShowSearch(false); }}
+              className={cn(
+                "p-2 rounded-xl transition-colors",
+                showFilters ? "bg-[#ff535b]/20 text-[#ff535b]" : "bg-white/5 text-[#6B6B6B] hover:bg-white/10"
+              )}
+            >
               <SlidersHorizontal size={18} />
             </button>
           </div>
@@ -215,7 +248,7 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
                   : "bg-transparent border-transparent text-[#4A4A4A] hover:text-[#6B6B6B]"
               )}
             >
-              All Archive
+              All Posts
             </button>
             {categories.map((cat) => (
               <button
@@ -232,6 +265,61 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
               </button>
             ))}
           </div>
+          {/* Search Input */}
+          <AnimatePresence>
+            {showSearch && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pb-3 flex items-center gap-2 bg-[#1c1b1b] rounded-2xl px-4 py-2 border border-white/5">
+                  <Search size={16} className="text-[#4A4A4A]" />
+                  <input
+                    ref={searchRef}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search posts..."
+                    className="flex-1 bg-transparent font-inter text-sm outline-none text-white placeholder:text-[#4A4A4A]"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery('')} className="text-[#4A4A4A] hover:text-white text-xs">✕</button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Filter Panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pb-3 flex items-center gap-2">
+                  <span className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest mr-2">Type:</span>
+                  {(['all', 'text', 'voice'] as const).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setPostType(type)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-xl font-syne font-bold text-[10px] uppercase tracking-widest transition-all border",
+                        postType === type
+                          ? "bg-[#ff535b]/10 border-[#ff535b]/30 text-[#ff535b]"
+                          : "bg-white/5 border-transparent text-[#4A4A4A] hover:text-white"
+                      )}
+                    >
+                      {type === 'all' ? 'All' : type === 'text' ? '📝 Text' : '🎙️ Voice'}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

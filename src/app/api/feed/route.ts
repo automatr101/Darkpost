@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   const sort = searchParams.get('sort') || 'new';
   const type = searchParams.get('type') || 'all';
   const cursor = searchParams.get('cursor');
+  const searchQ = searchParams.get('q') || '';
   const limit = 20;
 
   const supabase = createClient();
@@ -43,6 +44,11 @@ export async function GET(request: NextRequest) {
   // Filter by post type
   if (type !== 'all') {
     query = query.eq('post_type', type);
+  }
+
+  // Full-text search on content
+  if (searchQ.trim()) {
+    query = query.ilike('content', `%${searchQ.trim()}%`);
   }
 
   // Sort
