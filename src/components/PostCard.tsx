@@ -15,7 +15,6 @@ interface PostCardProps {
   post: Post;
   onClick?: () => void;
   onDelete?: (id: string) => void;
-  isUnlocked?: boolean;
   currentUser?: User | null;
 }
 
@@ -29,7 +28,7 @@ function getCategoryStyle(colorHex: string) {
 
 const STORAGE_URL = `https://rqjypyuifvezjtdxkaxn.supabase.co/storage/v1/object/public/voice-posts/`;
 
-export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked, currentUser }: PostCardProps) {
+export default function PostCard({ post, onDelete, currentUser }: PostCardProps) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);

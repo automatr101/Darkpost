@@ -187,7 +187,6 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
         <div className="px-4 py-4 border-b border-white/5">
           <PostCard
             post={post}
-            isUnlocked={true}
             currentUser={currentUser}
             onDelete={() => { window.location.href = '/'; }}
           />
