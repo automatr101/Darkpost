@@ -15,7 +15,6 @@ import {
   ShieldAlert 
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
-import PricingCards from '@/components/PricingCards';
 import type { Post, Profile } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -192,12 +191,6 @@ export default function ProfilePage() {
               </div>
             )}
           </AnimatePresence>
-        </div>
-
-        {/* Desktop Pricing Section */}
-        <div className="hidden md:block mt-24 border-t border-white/5 pt-12">
-          <h3 className="font-syne font-extrabold text-2xl text-center mb-8 tracking-tighter">Your Plan & Upgrades</h3>
-          <PricingCards />
         </div>
       </main>
     </div>

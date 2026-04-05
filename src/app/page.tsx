@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import FeedClient from '@/components/FeedClient';
 import Link from 'next/link';
-import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame, Settings as SettingsIcon } from 'lucide-react';
+import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame, Settings as SettingsIcon, Crown } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 import { Spinner } from '@/components/Spinner';
@@ -42,6 +42,7 @@ export default function Home() {
     { label: 'Home', icon: <HomeIcon size={22} />, href: '/', show: true, active: true },
     { label: 'Archive', icon: <Hash size={22} />, href: '/archive', show: true, active: false },
     { label: 'Profile', icon: <User size={22} />, href: '/profile', show: !!user, active: false },
+    { label: 'Upgrade', icon: <Crown size={22} />, href: '/pricing', show: !!user, active: false },
     { label: 'Login', icon: <LogIn size={22} />, href: '/login', show: !user, active: false },
     { label: 'Join', icon: <UserPlus size={22} />, href: '/signup', show: !user, active: false },
   ];
