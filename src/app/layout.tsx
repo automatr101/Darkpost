@@ -46,6 +46,12 @@ export default function RootLayout({
             gtag('config', 'G-4K38W5JYPF');
           `
         }} />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9378010048800128"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
