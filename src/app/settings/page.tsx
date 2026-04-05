@@ -293,7 +293,7 @@ function SettingsContent() {
                     <input
                       value={profile?.username || ''}
                       onChange={(e) => handleUsernameChange(e.target.value)}
-                      placeholder="shadow_drift"
+                      placeholder="username"
                       maxLength={30}
                       className={`w-full bg-black/40 border ${usernameWarning ? 'border-red-500/50' : 'border-white/10'} rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]`}
                     />
@@ -306,7 +306,7 @@ function SettingsContent() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between ml-1">
-                    <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest">Shadow Biography</label>
+                    <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest">Biography</label>
                     <span className={`text-[9px] font-syne font-bold ${(profile?.bio?.length || 0) > 150 ? 'text-[#ff535b]' : 'text-[#4A4A4A]'}`}>
                       {profile?.bio?.length || 0} / 160
                     </span>
@@ -314,12 +314,12 @@ function SettingsContent() {
                   <textarea
                     value={profile?.bio || ''}
                     onChange={(e) => setProfile((p) => p ? { ...p, bio: e.target.value } : p)}
-                    placeholder="Who are you in the shadows? Shared anonymously..."
+                    placeholder="Tell us a bit about yourself..."
                     rows={3}
                     maxLength={160}
                     className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a] resize-none"
                   />
-                  <p className="font-inter text-[10px] text-[#2a2a2a] ml-1">Your bio is public on your Enclave profile.</p>
+                  <p className="font-inter text-[10px] text-[#2a2a2a] ml-1">Your bio is public on your user profile.</p>
                 </div>
                 <button
                   disabled={saving}
