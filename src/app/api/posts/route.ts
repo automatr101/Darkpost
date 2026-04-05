@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   let body;
   try {
     body = await request.json();
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: validated.error.issues[0].message }, { status: 400 });
   }
 
-  let { content, is_anon, category_id, post_type, voice_url, waveform_data, duration_seconds } = validated.data;
+  let { content } = validated.data;
+  const { is_anon, category_id, post_type, voice_url, waveform_data, duration_seconds } = validated.data;
 
   if (post_type === 'text' && content) {
     // Strict HTML sanitization

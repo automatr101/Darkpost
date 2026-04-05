@@ -63,7 +63,7 @@ export async function POST(
   let body;
   try {
     body = await request.json();
-  } catch(e) {
+  } catch {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
