@@ -23,7 +23,7 @@ export default function TheVoidPage() {
           <div className="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-8 animate-pulse text-[#ff535b]">
             <Ghost className="w-8 h-8 md:w-10 md:h-10" />
           </div>
-          <h2 className="font-syne font-extrabold text-4xl md:text-5xl uppercase tracking-tighter mb-6">About the Void</h2>
+          <h2 className="font-syne font-extrabold text-4xl md:text-5xl uppercase tracking-tighter mb-6">About Darkpost</h2>
           <p className="font-dm-serif text-xl md:text-2xl text-[#6B6B6B] italic leading-relaxed">
             &ldquo;In the end, anonymity is not about hiding. 
             It is about finding the courage to be honest.&rdquo;
@@ -33,18 +33,18 @@ export default function TheVoidPage() {
         <div className="space-y-12">
           <LegalItem 
             icon={Shield} 
-            title="Protocol: Sanctity" 
-            content="Darkpost is built on the belief that digital memory should be as ephemeral as real conversation. We do not track your IP for targeting. We do not sell your soul to the highest bidder. Your confessions are encrypted until revealed by high-risk snapshots." 
+            title="Privacy" 
+            content="Darkpost is built on the principle that you should be able to speak freely without fear of being tracked or identified. We do not track your IP for targeting. We do not sell your data. Your posts are anonymous by default." 
           />
           <LegalItem 
             icon={Scale} 
             title="Rules (Terms)" 
-            content="By entering the void, you agree to the laws of the enclave. No malicious exposure. No targeted harassment. Confessions that violate the integrity of human dignity will be purged by the incinerator. Use your anonymity for truth, not destruction." 
+            content="By using Darkpost, you agree to our community rules. No harassment. No targeted hate. Posts that violate community standards will be removed. Use your anonymity responsibly." 
           />
           <LegalItem 
             icon={Sparkles} 
-            title="The Ash (Mockup Ash)" 
-            content="Ash is the currency of the void. Generated when threads are burnt. Sacrifice your Ash to unlock deeper archives or to incinerate threads that have become too visible. This is a mockup currency for the high-stakes editorial experience." 
+            title="Features (Coming Soon)" 
+            content="More features are on the way — including reactions, bookmarks, and profile customisation. Darkpost is actively being developed and improved." 
           />
         </div>
 

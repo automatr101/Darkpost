@@ -134,7 +134,7 @@ export default function LoginPage() {
                 <Spinner size="sm" />
                 Entering...
               </span>
-            ) : 'Enter the Archive'}
+            ) : 'Sign In'}
           </button>
         </form>
 
@@ -170,7 +170,7 @@ export default function LoginPage() {
         </button>
 
         <p className="text-center mt-8 font-inter" style={{ fontSize: '14px', color: '#6B6B6B' }}>
-          New to the archive?{' '}
+          New here?{' '}
           <Link href="/signup" style={{ color: '#ff535b' }} className="font-medium hover:underline">
             Create account
           </Link>

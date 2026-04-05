@@ -108,8 +108,6 @@ export default function Home() {
                 👻
              </div>
              <div className="flex-1 overflow-hidden">
-                <p className="font-syne font-bold text-[11px] text-white truncate uppercase tracking-tight">Active Soul</p>
-                <p className="font-syne font-bold text-[11px] text-white truncate uppercase tracking-tight">Active</p>
                 <p className="font-inter text-[9px] text-[#6B6B6B] truncate">{user.email}</p>
              </div>
           </div>
@@ -301,7 +299,7 @@ export default function Home() {
               className="font-syne font-bold uppercase tracking-widest"
               style={{ fontSize: '8px', color: pathname === '/settings' ? '#ff535b' : '#444' }}
             >
-              Enclave
+              Settings
             </span>
           </Link>
         </div>

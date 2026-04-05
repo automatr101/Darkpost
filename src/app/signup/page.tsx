@@ -69,7 +69,7 @@ export default function SignupPage() {
           </h2>
           <p className="font-inter" style={{ fontSize: '14px', color: '#6B6B6B', lineHeight: '1.6' }}>
             We sent a confirmation link to <strong style={{ color: '#F0ECE3' }}>{email}</strong>.
-            Click it to enter the archive and begin.
+            Click the link to verify your email and get started.
           </p>
           <button 
              onClick={() => setSuccess(false)}
@@ -173,7 +173,7 @@ export default function SignupPage() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'Creating...' : 'Join the Archive'}
+            {loading ? 'Creating...' : 'Create Account'}
           </button>
         </form>
 
@@ -204,7 +204,7 @@ export default function SignupPage() {
         </button>
 
         <p className="text-center mt-8 font-inter" style={{ fontSize: '14px', color: '#6B6B6B' }}>
-          Already in the archive?{' '}
+          Already have an account?{' '}
           <Link href="/login" style={{ color: '#ff535b' }} className="font-medium hover:underline">
             Sign in
           </Link>

@@ -79,7 +79,7 @@ export default function ProfilePage() {
         </Link>
         <div>
           <h1 className="font-syne font-bold text-lg uppercase tracking-tight">
-            {profile?.display_name || profile?.username || 'The Archive'}
+            {profile?.display_name || profile?.username || 'Anonymous'}
           </h1>
           <p className="font-inter text-[11px] text-[#4A4A4A] uppercase tracking-widest">
             {posts.length} Confessions
@@ -132,7 +132,7 @@ export default function ProfilePage() {
              <div className="bg-[#1c1b1b] border border-white/5 p-3 md:p-4 rounded-2xl text-center group/stat hover:border-purple-400/30 transition-colors">
                 <ShieldAlert className="mx-auto mb-1.5 md:mb-2 text-purple-400 w-4 h-4 md:w-5 md:h-5" />
                 <p className="font-syne font-extrabold text-lg md:text-xl">100%</p>
-                <p className="font-inter text-[8px] md:text-[10px] text-[#4A4A4A] uppercase tracking-widest">Sanctity</p>
+                <p className="font-inter text-[8px] md:text-[10px] text-[#4A4A4A] uppercase tracking-widest">Privacy</p>
              </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function ProfilePage() {
                activeTab === 'posts' ? "text-white" : "text-[#4A4A4A] hover:text-[#6B6B6B]"
              )}
            >
-             The Archive
+             Posts
              {activeTab === 'posts' && (
                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#ff535b] rounded-t-full" />
              )}

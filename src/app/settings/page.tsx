@@ -96,7 +96,7 @@ export default function SettingsPage() {
     } else {
       // Keep the cleaned username in state
       setProfile(p => p ? { ...p, username: cleanUsername } : p);
-      setSuccess('Your soul record has been updated.');
+      setSuccess('Your profile has been updated.');
       setTimeout(() => setSuccess(''), 3000);
     }
     setSaving(false);
@@ -121,7 +121,7 @@ export default function SettingsPage() {
         <Link href="/profile" className="p-2 hover:bg-white/5 rounded-full transition-colors">
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="font-syne font-bold text-lg uppercase tracking-tight">The Enclave Settings</h1>
+        <h1 className="font-syne font-bold text-lg uppercase tracking-tight">Settings</h1>
       </header>
 
       <main className="max-w-2xl mx-auto py-8 px-4">
@@ -131,7 +131,7 @@ export default function SettingsPage() {
            <section>
               <div className="flex items-center gap-3 mb-6">
                  <User size={18} className="text-[#ff535b]" />
-                 <h2 className="font-syne font-extrabold text-xl uppercase tracking-tighter">Identity Core</h2>
+                 <h2 className="font-syne font-extrabold text-xl uppercase tracking-tighter">Edit Profile</h2>
               </div>
 
               <form onSubmit={handleUpdateProfile} className="space-y-6">
@@ -140,16 +140,16 @@ export default function SettingsPage() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        <div className="space-y-2">
-                          <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Display Alias</label>
+                          <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Display Name</label>
                           <input 
                             value={profile?.display_name || ''}
                             onChange={(e) => setProfile(p => p ? {...p, display_name: e.target.value} : p)}
-                            placeholder="Ghost Walker"
+                            placeholder="Your name"
                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]"
                           />
                        </div>
                        <div className="space-y-2">
-                          <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Frequency (@)</label>
+                          <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Username (@)</label>
                           <input 
                            value={profile?.username || ''}
                            onChange={(e) => setProfile(p => p ? {...p, username: sanitizeUsername(e.target.value)} : p)}
@@ -162,11 +162,11 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Echo Persona (Bio)</label>
+                       <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Bio</label>
                        <textarea 
                           value={profile?.bio || ''}
                           onChange={(e) => setProfile(p => p ? {...p, bio: e.target.value} : p)}
-                          placeholder="What would your ghost say?"
+                          placeholder="Tell us about yourself"
                           rows={3}
                           className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a] resize-none"
                        />
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                        className="w-full flex items-center justify-center gap-2 bg-[#F0ECE3] hover:bg-white text-[#131313] py-4 rounded-2xl font-syne font-extrabold text-[12px] uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
                     >
                        {saving ? <Ghost className="animate-pulse" size={16} /> : <Save size={16} />}
-                       Update Soul Record
+                       Save Changes
                     </button>
 
                     {success && <p className="text-center font-inter text-[11px] text-green-400/80 uppercase tracking-widest mt-2">{success}</p>}
@@ -191,7 +191,7 @@ export default function SettingsPage() {
            <section>
               <div className="flex items-center gap-3 mb-6">
                  <Shield size={18} className="text-[#6B6B6B]" />
-                 <h2 className="font-syne font-extrabold text-xl uppercase tracking-tighter">Security Protocols</h2>
+                 <h2 className="font-syne font-extrabold text-xl uppercase tracking-tighter">Account</h2>
               </div>
 
               <div className="flex flex-col gap-3">
@@ -204,8 +204,8 @@ export default function SettingsPage() {
                           <LogOut size={18} />
                        </div>
                        <div className="text-left">
-                          <p className="font-syne font-bold text-sm uppercase tracking-tight">Incinerate Session</p>
-                          <p className="font-inter text-[11px] text-[#4A4A4A]">Logout from the archive.</p>
+                          <p className="font-syne font-bold text-sm uppercase tracking-tight">Log Out</p>
+                          <p className="font-inter text-[11px] text-[#4A4A4A]">Sign out of your account.</p>
                        </div>
                     </div>
                  </button>
@@ -218,8 +218,8 @@ export default function SettingsPage() {
                           <Trash2 size={18} />
                        </div>
                        <div className="text-left">
-                          <p className="font-syne font-bold text-sm uppercase tracking-tight text-red-500">Purge Record</p>
-                          <p className="font-inter text-[11px] text-red-500/50">Delete your soul irrevocably.</p>
+                          <p className="font-syne font-bold text-sm uppercase tracking-tight text-red-500">Delete Account</p>
+                          <p className="font-inter text-[11px] text-red-500/50">Permanently delete your account.</p>
                        </div>
                     </div>
                  </button>

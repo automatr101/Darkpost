@@ -86,7 +86,7 @@ export default function ArchiveExplorePage() {
            <input 
              value={searchQuery}
              onChange={(e) => setSearchQuery(e.target.value)}
-             placeholder="Search the archive..."
+             placeholder="Search posts..."
              className="bg-transparent flex-1 font-inter text-sm outline-none placeholder:text-[#4A4A4A] text-white"
            />
            {searchQuery && (
@@ -122,7 +122,7 @@ export default function ArchiveExplorePage() {
                 ) : !isSearchingBackend && (
                    <div className="py-24 text-center border border-dashed border-white/5 rounded-[40px] flex flex-col items-center gap-4">
                       <Ghost size={32} className="text-[#2a2a2a]" />
-                      <p className="text-[#4A4A4A] font-inter text-sm italic">Nothing but digital echoes in the void.</p>
+                      <p className="text-[#4A4A4A] font-inter text-sm italic">Nothing to show yet.</p>
                    </div>
                 )}
              </motion.section>

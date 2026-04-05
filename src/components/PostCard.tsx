@@ -104,7 +104,7 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
   const handleArchiveDeletion = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm('Are you sure you want to incinerate this confession? It will be purged from the archive forever.')) return;
+    if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) return;
 
     setIsDeleting(true);
     try {
@@ -244,7 +244,7 @@ export default function PostCard({ post, onDelete, isUnlocked: externalUnlocked,
                   onClick={handleArchiveDeletion}
                   className="p-1 px-2 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 font-syne font-bold text-[8px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all pointer-events-auto"
                 >
-                  Incinerate
+                  Delete
                 </button>
               )}
             </div>

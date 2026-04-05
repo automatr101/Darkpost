@@ -476,7 +476,7 @@ export default function ComposePage() {
           {/* Category Selector */}
           <div className="mt-4">
             <p className="font-syne font-bold mb-3" style={{ fontSize: '13px', color: '#6B6B6B' }}>
-              Classify the archive
+              Pick a category
             </p>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
@@ -520,8 +520,8 @@ export default function ComposePage() {
               onSuccess={handleSubmit}
               disabled={!canPost || loading}
               isLoading={loading}
-              text={tab === 'voice' ? 'SLIDE TO POST VOICE' : 'SLIDE TO CONFESS'}
-              successText={loading ? 'POSTING...' : 'CONFESSED'}
+              text={tab === 'voice' ? 'SLIDE TO POST' : 'SLIDE TO POST'}
+              successText={loading ? 'POSTING...' : 'POSTED!'}
             />
           </div>
         </div>

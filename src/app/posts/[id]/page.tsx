@@ -136,12 +136,12 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
      return (
         <div className="min-h-screen bg-[#131313] flex flex-col items-center justify-center p-6 text-center">
            <Flame size={64} className="text-[#ff535b] mb-6 animate-bounce" />
-           <h1 className="font-syne font-extrabold text-3xl mb-4 text-[#ff535b] uppercase tracking-tighter">This memory has burnt out</h1>
+           <h1 className="font-syne font-extrabold text-3xl mb-4 text-[#ff535b] uppercase tracking-tighter">Post not found</h1>
            <p className="font-inter text-[#6B6B6B] max-w-sm">
-              The archive has reclaimed this confession. It was too heavy for the digital world.
+              This post has been deleted or does not exist.
            </p>
            <Link href="/" className="mt-8 px-8 py-3 rounded-full bg-white/5 border border-white/5 font-syne font-bold text-sm uppercase">
-              Keep Wandering
+              Back to feed
            </Link>
         </div>
      );
