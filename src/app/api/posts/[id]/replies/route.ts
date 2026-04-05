@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
 import { applyRateLimit } from '@/lib/rate-limit';
 
 const replySchema = z.object({
   content: z.string().min(1, 'Reply content is required.').max(280, 'Reply must be 280 characters or fewer.'),
 });
+
+/**
+ * Strips all HTML tags from a string. 
+ * Replaces complex JSDOM-based sanitization to avoid ESM/CJS headaches on Vercel.
+ */
+function stripHtmlTags(str: string): string {
+  if (!str) return '';
+  return str.replace(/<[^>]*>/g, '').trim();
+}
 
 /**
  * GET /api/posts/[id]/replies
@@ -72,8 +80,8 @@ export async function POST(
     return NextResponse.json({ error: validated.error.issues[0].message }, { status: 400 });
   }
 
-  // Strict HTML sanitization
-  const content = DOMPurify.sanitize(validated.data.content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+  // Simplified sanitization: strip all tags
+  const content = stripHtmlTags(validated.data.content);
 
   const { data: reply, error } = await supabase
     .from('replies')
@@ -111,11 +119,6 @@ export async function DELETE(
     return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   }
 
-  // Soft delete or hard delete. Darkpost has deleted_at on some tables, but maybe not on replies.
-  // Actually, in the GET method we check `.is('deleted_at', null)`, meaning soft deletes are used! 
-  // Let's check if the column exists. If we aren't sure, hard delete is safer or we can do soft delete.
-  // We'll soft delete to be safe: update({ deleted_at: new Date().toISOString() })
-  
   const { data: existingReply, error: findError } = await supabase
     .from('replies')
     .select('user_id')
