@@ -120,9 +120,21 @@ export default function PostCard({ post, onDelete, currentUser }: PostCardProps)
     e.preventDefault();
     e.stopPropagation();
     const url = `${window.location.origin}/posts/${post.id}`;
-    await navigator.clipboard.writeText(url).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Darkpost Confession',
+          text: 'Listen to this echo on Darkpost',
+          url,
+        });
+      } catch {
+        // user aborted or failed
+      }
+    } else {
+      await navigator.clipboard.writeText(url).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleArchiveDeletion = async (e: React.MouseEvent) => {

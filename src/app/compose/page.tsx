@@ -111,11 +111,11 @@ export default function ComposePage() {
       timerRef.current = setInterval(() => {
         setRecordingTime((t) => {
           const newTime = t + 0.1;
-          if (newTime >= 60) {
+          if (newTime >= 30) {
             mediaRecorder.stop();
             setIsRecording(false);
             if (timerRef.current) clearInterval(timerRef.current);
-            return 60;
+            return 30;
           }
           // Sample amplitude
           if (analyserRef.current) {
@@ -443,10 +443,10 @@ export default function ComposePage() {
                   </button>
                   <p className="font-inter mt-4" style={{ color: '#6B6B6B', fontSize: '14px' }}>
                     {isRecording
-                      ? `0:${Math.floor(recordingTime).toString().padStart(2, '0')} / 1:00`
-                      : 'Tap to record. Max 60 seconds.'}
+                      ? `0:${Math.floor(recordingTime).toString().padStart(2, '0')} / 0:30`
+                      : 'Tap to record. Max 30 seconds.'}
                   </p>
-                  {isRecording && recordingTime >= 60 && (
+                  {isRecording && recordingTime >= 30 && (
                     <p className="font-inter mt-2 font-medium" style={{ color: '#ff535b', fontSize: '13px' }}>
                       Max Duration Reached
                     </p>

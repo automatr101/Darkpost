@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     if (!waveform_data || !Array.isArray(waveform_data)) {
       return NextResponse.json({ error: 'Waveform data is required for voice posts.' }, { status: 400 });
     }
-    if (duration_seconds && duration_seconds > 15) {
-      return NextResponse.json({ error: 'Voice posts must be 15 seconds or shorter.' }, { status: 400 });
+    if (duration_seconds && duration_seconds > 30) {
+      return NextResponse.json({ error: 'Voice posts must be 30 seconds or shorter.' }, { status: 400 });
     }
     // TODO: Post-MVP: transcribe voice posts and run moderation filter on the transcript.
   }

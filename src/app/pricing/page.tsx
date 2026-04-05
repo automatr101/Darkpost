@@ -4,7 +4,7 @@ import PricingCards from '@/components/PricingCards';
 
 export const metadata = {
   title: 'Pricing | Darkpost',
-  description: 'Choose your Darkpost plan. Free, Pro ($3/mo), or Black ($7/mo).',
+  description: 'Choose your Darkpost plan. Free, Pro ($2.99/mo), or Black ($6.99/mo).',
 };
 
 export default function PricingPage() {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -14,6 +15,7 @@ import {
   Send,
   Flame,
   MoreHorizontal,
+  X,
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
 import type { Post, Reply } from '@/lib/types';
@@ -23,6 +25,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post | null>(null);
   const [replies, setReplies] = useState<Reply[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [isBurnt, setIsBurnt] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -142,6 +145,18 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
     setIsBookmarked(!isBookmarked);
   };
 
+  const handleDeleteReply = async (replyId: string) => {
+    if (!confirm('Are you sure you want to delete this reply?')) return;
+    try {
+      const res = await fetch(`/api/posts/${params.id}/replies?replyId=${replyId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setReplies((prev) => prev.filter(r => r.id !== replyId));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#131313] flex items-center justify-center">
@@ -171,9 +186,9 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
       {/* Header */}
       <header className="sticky top-0 z-30 bg-[#131313]/90 backdrop-blur-xl border-b border-white/5 px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+          <button onClick={() => router.back()} className="p-2 hover:bg-white/5 rounded-full transition-colors">
             <ArrowLeft size={20} />
-          </Link>
+          </button>
           <h1 className="font-syne font-bold text-base uppercase tracking-tight">Post</h1>
         </div>
         <div className="flex items-center gap-1">
@@ -329,6 +344,11 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                     <span className="font-inter text-[11px] text-[#353534]">
                       {formatDistanceToNow(new Date(reply.created_at))} ago
                     </span>
+                    {currentUser?.id === reply.user_id && (
+                      <button onClick={() => handleDeleteReply(reply.id)} className="ml-2 text-red-500 hover:text-red-400 p-1">
+                        <X size={12} />
+                      </button>
+                    )}
                   </div>
                   <p className="font-inter text-[14px] text-[#C0BCBA] leading-relaxed">{reply.content}</p>
                 </div>

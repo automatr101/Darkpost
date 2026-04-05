@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -14,6 +15,7 @@ import {
   ShieldAlert 
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
+import PricingCards from '@/components/PricingCards';
 import type { Post, Profile } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +26,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'posts' | 'saved'>('posts');
   
+  const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
@@ -74,9 +77,9 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#131313] text-[#F0ECE3] pb-24 md:pb-12">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 px-4 h-16 flex items-center gap-4">
-        <Link href="/" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+        <button onClick={() => router.back()} className="p-2 hover:bg-white/5 rounded-full transition-colors">
           <ArrowLeft size={20} />
-        </Link>
+        </button>
         <div>
           <h1 className="font-syne font-bold text-lg uppercase tracking-tight">
             {profile?.display_name || profile?.username || 'Anonymous'}
@@ -189,6 +192,12 @@ export default function ProfilePage() {
               </div>
             )}
           </AnimatePresence>
+        </div>
+
+        {/* Desktop Pricing Section */}
+        <div className="hidden md:block mt-24 border-t border-white/5 pt-12">
+          <h3 className="font-syne font-extrabold text-2xl text-center mb-8 tracking-tighter">Your Plan & Upgrades</h3>
+          <PricingCards />
         </div>
       </main>
     </div>

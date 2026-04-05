@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 const FREE_FEATURES = {
   "Core": [
     'Text confessions',
-    'Voice posts up to 15s',
+    'Voice posts up to 30s',
     'Anon toggle per post',
     'Random alias (Shadow #)',
   ],
@@ -71,8 +71,8 @@ interface PriceData {
 }
 
 const PRICES: Record<Tier, PriceData> = {
-  pro: { USD: 3, GHS: 45 },
-  black: { USD: 7, GHS: 105 },
+  pro: { USD: 2.99, GHS: 44.99 },
+  black: { USD: 6.99, GHS: 104.99 },
 };
 
 function FeatureList({ groups }: { groups: Record<string, string[]> }) {
@@ -230,6 +230,7 @@ export default function PricingCards() {
               </span>
               <NumberFlow 
                 value={PRICES.pro[currency]} 
+                format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
                 className="font-syne font-extrabold text-5xl tracking-tighter text-white"
               />
               <span className="text-white/30 text-xs font-medium ml-1">/mo</span>
@@ -294,6 +295,7 @@ export default function PricingCards() {
               </span>
               <NumberFlow 
                 value={PRICES.black[currency]} 
+                format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
                 className="font-syne font-extrabold text-5xl tracking-tighter text-white"
               />
               <span className="text-white/30 text-xs font-medium ml-1">/mo</span>

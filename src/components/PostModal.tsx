@@ -4,12 +4,14 @@ import { X, MessageCircle, Ghost, Send, Camera, Lock, Sparkles } from 'lucide-re
 import ScreenshotCard from './ScreenshotCard';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import { createClient } from '@/utils/supabase/client';
 import type { Post } from '@/lib/types';
 
 interface Reply {
   id: string;
   content: string;
   created_at: string;
+  user_id?: string;
   user?: { username: string; display_name: string | null; avatar_url: string | null };
 }
 
@@ -26,7 +28,12 @@ export default function PostModal({ post, onClose }: PostModalProps) {
   const [loading, setLoading] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [submittingReply, setSubmittingReply] = useState(false);
+  const [currentUser, setCurrentUser] = useState<import('@supabase/supabase-js').User | null>(null);
   const screenshotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => setCurrentUser(data.user));
+  }, []);
 
   const displayName = post.is_anon
     ? post.alias || 'Anonymous'
@@ -108,6 +115,18 @@ export default function PostModal({ post, onClose }: PostModalProps) {
       // Error
     } finally {
       setSubmittingReply(false);
+    }
+  }
+
+  async function handleDeleteReply(replyId: string) {
+    if (!confirm('Are you sure you want to delete this reply?')) return;
+    try {
+      const res = await fetch(`/api/posts/${post.id}/replies?replyId=${replyId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setReplies((prev) => prev.filter(r => r.id !== replyId));
+      }
+    } catch {
+      // ignore
     }
   }
 
@@ -282,9 +301,16 @@ export default function PostModal({ post, onClose }: PostModalProps) {
                                    <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-[10px]">👤</div>
                                    <span className="font-syne font-black text-[#F0ECE3] text-[11px] uppercase tracking-widest">@{reply.user?.username || 'phantom'}</span>
                                 </div>
-                                <span className="text-[10px] text-[#4A4A4A] font-medium tracking-tighter">
-                                  {formatDistanceToNow(new Date(reply.created_at))} ago
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-[#4A4A4A] font-medium tracking-tighter">
+                                    {formatDistanceToNow(new Date(reply.created_at))} ago
+                                  </span>
+                                  {currentUser?.id === reply.user_id && (
+                                    <button onClick={() => handleDeleteReply(reply.id)} className="text-red-500 hover:text-red-400 p-1">
+                                      <X size={12} />
+                                    </button>
+                                  )}
+                                </div>
                              </div>
                              <p className="text-[#9A9A9A] text-[14px] leading-relaxed pl-8">
                                 {reply.content}
