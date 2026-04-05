@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
 import { applyRateLimit } from '@/lib/rate-limit';
 
 const postSchema = z.object({
@@ -13,6 +12,15 @@ const postSchema = z.object({
   waveform_data: z.array(z.number()).optional(),
   duration_seconds: z.number().int().optional(),
 });
+
+/**
+ * Strips all HTML tags from a string. 
+ * Replaces complex JSDOM-based sanitization to avoid ESM/CJS headaches on Vercel.
+ */
+function stripHtmlTags(str: string): string {
+  if (!str) return '';
+  return str.replace(/<[^>]*>/g, '').trim();
+}
 
 function containsBlockedContent(text: string): boolean {
   const blockedTerms = ['badword1', 'badword2']; // Example terms
@@ -77,7 +85,8 @@ export async function POST(request: NextRequest) {
     const { is_anon, category_id, post_type, voice_url, waveform_data, duration_seconds } = validated.data;
 
     if (post_type === 'text' && content) {
-      content = DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+      // Simplified sanitization: strip all tags
+      content = stripHtmlTags(content);
       if (containsBlockedContent(content)) {
         return NextResponse.json({ error: 'This post contains content that violates our guidelines.' }, { status: 400 });
       }

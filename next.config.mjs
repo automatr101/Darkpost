@@ -1,8 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['isomorphic-dompurify'],
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;
