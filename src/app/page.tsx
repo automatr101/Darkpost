@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import FeedClient from '@/components/FeedClient';
 import Link from 'next/link';
-import { Home as HomeIcon, Plus, User, LogIn, Ghost, Hash, LogOut, Flame, Settings } from 'lucide-react';
+import { Home as HomeIcon, Plus, User, LogIn, UserPlus, Ghost, Hash, LogOut, Flame } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 import { Spinner } from '@/components/Spinner';
