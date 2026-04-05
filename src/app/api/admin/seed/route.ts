@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { items, distributeOverHours = 12 } = await request.json();
+  const { items } = await request.json();
 
   if (!Array.isArray(items)) {
     return NextResponse.json({ error: 'Invalid items list' }, { status: 400 });

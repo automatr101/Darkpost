@@ -72,8 +72,9 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: 'Confession incinerated from the archive.' });
-  } catch (err: any) {
-    console.error('Unexpected delete error:', err);
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Unexpected delete error:', errorMessage);
     return NextResponse.json({ error: 'An unexpected error occurred during incineration.' }, { status: 500 });
   }
 }
