@@ -49,6 +49,7 @@ function SettingsContent() {
   const [periodEnd, setPeriodEnd] = useState<string | null>(null);
   const [subLoading, setSubLoading] = useState(false);
   const [upgradeSuccess, setUpgradeSuccess] = useState(false);
+  const [usernameWarning, setUsernameWarning] = useState('');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -104,6 +105,20 @@ function SettingsContent() {
       .slice(0, 30);
   }
 
+  function validateUsername(raw: string) {
+    if (/[A-Z]/.test(raw)) return 'Usernames must be lowercase.';
+    if (/\s/.test(raw)) return 'Usernames cannot contain spaces.';
+    if (/[^a-z0-9_]/.test(raw)) return 'Letters, numbers, and underscores only.';
+    return '';
+  }
+
+  function handleUsernameChange(val: string) {
+    if (profile) {
+      setProfile({ ...profile, username: val });
+      setUsernameWarning(validateUsername(val));
+    }
+  }
+
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -111,18 +126,25 @@ function SettingsContent() {
     setSuccess('');
     if (!user || !profile) { setSaving(false); return; }
 
+    // Final sanitization before saving
     const cleanUsername = sanitizeUsername(profile.username);
     if (!cleanUsername || cleanUsername.length < 3) {
-      setError('Username must be at least 3 characters (letters, numbers, underscores only).');
+      setError('Username must be at least 3 characters.');
+      setSaving(false);
+      return;
+    }
+
+    if (usernameWarning) {
+      setError(usernameWarning);
       setSaving(false);
       return;
     }
 
     const { error: updateError } = await supabase.from('users').upsert({
       id: user.id,
-      display_name: profile.display_name,
+      display_name: profile.display_name || '',
       username: cleanUsername,
-      bio: profile.bio,
+      bio: profile.bio || '',
       updated_at: new Date().toISOString(),
     });
 
@@ -270,23 +292,34 @@ function SettingsContent() {
                     <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Username (@)</label>
                     <input
                       value={profile?.username || ''}
-                      onChange={(e) => setProfile((p) => p ? { ...p, username: sanitizeUsername(e.target.value) } : p)}
+                      onChange={(e) => handleUsernameChange(e.target.value)}
                       placeholder="shadow_drift"
                       maxLength={30}
-                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]"
+                      className={`w-full bg-black/40 border ${usernameWarning ? 'border-red-500/50' : 'border-white/10'} rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a]`}
                     />
-                    <p className="font-inter text-[10px] text-[#4A4A4A] ml-1">lowercase · letters, numbers, underscores only</p>
+                    {usernameWarning ? (
+                      <p className="font-inter text-[10px] text-red-500/80 ml-1 font-semibold uppercase tracking-wider">{usernameWarning}</p>
+                    ) : (
+                      <p className="font-inter text-[10px] text-[#4A4A4A] ml-1 tracking-tight">lowercase · letters, numbers, underscores only</p>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest ml-1">Bio</label>
+                  <div className="flex items-center justify-between ml-1">
+                    <label className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest">Shadow Biography</label>
+                    <span className={`text-[9px] font-syne font-bold ${(profile?.bio?.length || 0) > 150 ? 'text-[#ff535b]' : 'text-[#4A4A4A]'}`}>
+                      {profile?.bio?.length || 0} / 160
+                    </span>
+                  </div>
                   <textarea
                     value={profile?.bio || ''}
                     onChange={(e) => setProfile((p) => p ? { ...p, bio: e.target.value } : p)}
-                    placeholder="Tell us about yourself"
+                    placeholder="Who are you in the shadows? Shared anonymously..."
                     rows={3}
+                    maxLength={160}
                     className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 font-inter text-sm outline-none focus:border-[#ff535b]/30 transition-all placeholder:text-[#2a2a2a] resize-none"
                   />
+                  <p className="font-inter text-[10px] text-[#2a2a2a] ml-1">Your bio is public on your Enclave profile.</p>
                 </div>
                 <button
                   disabled={saving}
