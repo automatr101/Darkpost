@@ -11,7 +11,7 @@ export default function TheVoidPage() {
         <Link href="/" className="p-2 hover:bg-white/5 rounded-full transition-colors">
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="font-syne font-bold text-lg uppercase tracking-tight">The Manifest</h1>
+        <h1 className="font-syne font-bold text-lg uppercase tracking-tight">About</h1>
       </header>
 
       <main className="max-w-2xl mx-auto py-12 px-6">
@@ -38,7 +38,7 @@ export default function TheVoidPage() {
           />
           <LegalItem 
             icon={Scale} 
-            title="The Covenant (Terms)" 
+            title="Rules (Terms)" 
             content="By entering the void, you agree to the laws of the enclave. No malicious exposure. No targeted harassment. Confessions that violate the integrity of human dignity will be purged by the incinerator. Use your anonymity for truth, not destruction." 
           />
           <LegalItem 

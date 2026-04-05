@@ -122,7 +122,7 @@ export default function ProfilePage() {
              <div className="bg-[#1c1b1b] border border-white/5 p-3 md:p-4 rounded-2xl text-center group/stat hover:border-[#ff535b]/30 transition-colors">
                 <Flame className="mx-auto mb-1.5 md:mb-2 text-[#ff535b] w-4 h-4 md:w-5 md:h-5" />
                 <p className="font-syne font-extrabold text-lg md:text-xl">{totalConfessions}</p>
-                <p className="font-inter text-[8px] md:text-[10px] text-[#4A4A4A] uppercase tracking-widest">Active Souls</p>
+                <p className="font-inter text-[8px] md:text-[10px] text-[#4A4A4A] uppercase tracking-widest">Posts</p>
              </div>
              <div className="bg-[#1c1b1b] border border-white/5 p-3 md:p-4 rounded-2xl text-center group/stat hover:border-blue-400/30 transition-colors">
                 <Camera className="mx-auto mb-1.5 md:mb-2 text-blue-400 w-4 h-4 md:w-5 md:h-5" />
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                activeTab === 'saved' ? "text-white" : "text-[#4A4A4A] hover:text-[#6B6B6B]"
              )}
            >
-             Watched Souls
+             Saved
              {activeTab === 'saved' && (
                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#ff535b] rounded-t-full" />
              )}

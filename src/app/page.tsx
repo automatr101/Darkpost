@@ -109,23 +109,23 @@ export default function Home() {
              </div>
              <div className="flex-1 overflow-hidden">
                 <p className="font-syne font-bold text-[11px] text-white truncate uppercase tracking-tight">Active Soul</p>
+                <p className="font-syne font-bold text-[11px] text-white truncate uppercase tracking-tight">Active</p>
                 <p className="font-inter text-[9px] text-[#6B6B6B] truncate">{user.email}</p>
              </div>
           </div>
         )}
 
         {/* Footer in Sidebar */}
-        <div className="mt-auto px-4 pb-4">
-           <div className="p-4 rounded-2xl bg-[#1c1b1b]/50 border border-white/5 backdrop-blur-sm">
-             <div className="flex items-center gap-2 mb-2">
-               <Ghost size={14} className="text-[#ff535b]" />
-               <p className="font-syne font-bold text-[10px] text-[#6B6B6B] uppercase tracking-widest">Enclave Status</p>
-             </div>
-             <p className="font-inter text-[12px] text-[#353534] leading-relaxed italic">
-               &ldquo;Your identity stays buried.&rdquo;
-             </p>
-           </div>
-        </div>
+         <div className="mt-auto px-4 pb-4">
+            <div className="p-4 rounded-2xl bg-[#1c1b1b]/50 border border-white/5 backdrop-blur-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Ghost size={14} className="text-[#ff535b]" />
+              </div>
+              <p className="font-inter text-[12px] text-[#353534] leading-relaxed italic">
+                &ldquo;Nobody knows it&apos;s you.&rdquo;
+              </p>
+            </div>
+         </div>
       </aside>
 
       {/* Main Content Area */}
@@ -159,14 +159,14 @@ export default function Home() {
         <div className="bg-[#1c1b1b] border border-white/5 rounded-3xl p-6 mb-8">
           <h2 className="font-syne font-extrabold text-lg uppercase tracking-tight mb-6 flex items-center gap-3">
             <Flame size={20} className="text-[#ff535b]" />
-            Trending Shadows
+            Trending
           </h2>
           <div className="flex flex-col gap-6">
             {[
-              { category: 'LOVE', label: '#HeartbreakHotel', user: '2.4k Souls' },
-              { category: 'WORK', label: '#BossFromHell', user: '1.2k Souls' },
-              { category: 'SCHOOL', label: '#CheatingArchived', user: '850 Souls' },
-              { category: 'FAMILY', label: '#InheritanceWar', user: '2.1k Souls' },
+              { category: 'LOVE', label: '#HeartbreakHotel', user: '2.4k' },
+              { category: 'WORK', label: '#BossFromHell', user: '1.2k' },
+              { category: 'SCHOOL', label: '#CheatingArchived', user: '850' },
+              { category: 'FAMILY', label: '#InheritanceWar', user: '2.1k' },
             ].map((item) => (
               <div key={item.label} className="group cursor-pointer">
                 <p className="font-syne font-bold text-[10px] text-[#4A4A4A] uppercase tracking-widest mb-1 group-hover:text-[#ff535b] transition-colors">
@@ -188,12 +188,12 @@ export default function Home() {
 
         <div className="mt-auto pt-12 pb-8 border-t border-white/5">
           <div className="flex gap-4 flex-wrap mb-4" style={{ fontSize: '11px', color: '#353534' }}>
-            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">Manifest</Link>
-            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">Covenant</Link>
-            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">The Void</Link>
+            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">About</Link>
+            <Link href="/about" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">Rules</Link>
+            <Link href="/" className="font-inter uppercase font-bold tracking-widest hover:text-[#ff535b] transition-colors">Feed</Link>
           </div>
           <p className="font-inter" style={{ fontSize: '10px', color: '#353534', opacity: 0.5 }}>
-            © 2026 DARKPOST INC. <br/> ANONYMITY IS SACRED.
+            © 2026 DARKPOST INC. <br/> Say what you actually think.
           </p>
         </div>
       </aside>
@@ -286,7 +286,7 @@ export default function Home() {
             <Link href="/login" className="flex flex-col items-center justify-end gap-1 pb-3 min-w-[60px] group">
               <LogIn size={22} className="text-[#555] group-active:text-white transition-colors" />
               <span className="font-syne font-bold uppercase tracking-widest" style={{ fontSize: '8px', color: '#444' }}>
-                Enter
+                Log In
               </span>
             </Link>
           )}

@@ -137,7 +137,7 @@ export default function ArchiveExplorePage() {
               <section className="mb-10 md:mb-12">
                  <div className="flex items-center gap-3 mb-6 px-2 md:px-0">
                     <TrendingUp size={20} className="text-[#ff535b]" />
-                    <h2 className="font-syne font-extrabold text-xl md:text-2xl uppercase tracking-tighter">Trending Shadows</h2>
+                    <h2 className="font-syne font-extrabold text-xl md:text-2xl uppercase tracking-tighter">Trending</h2>
                  </div>
                  <div className="flex flex-col gap-4">
                     {trendingPosts.length > 0 ? trendingPosts.slice(0, 3).map((post) => (
@@ -170,7 +170,7 @@ export default function ArchiveExplorePage() {
                           <div className="absolute inset-x-0 bottom-0 p-4 z-10 bg-gradient-to-t from-black to-transparent">
                              <h3 className="font-syne font-extrabold text-md md:text-lg uppercase tracking-tight">{cat.label}</h3>
                              <p className="font-inter text-[9px] md:text-[10px] text-[#6B6B6B] uppercase tracking-widest">
-                                {Math.floor(Math.random() * 100)} Active Souls
+                                {Math.floor(Math.random() * 100)} posts
                              </p>
                           </div>
                        </Link>

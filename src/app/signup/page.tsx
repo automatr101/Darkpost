@@ -107,7 +107,7 @@ export default function SignupPage() {
             DARK<span style={{ color: '#ff535b' }}>.</span>POST
           </h1>
           <p className="font-inter" style={{ fontSize: '14px', color: '#6B6B6B' }}>
-            Your identity stays buried.
+            Nobody knows it&apos;s you.
           </p>
         </div>
 

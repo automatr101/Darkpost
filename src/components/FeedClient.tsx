@@ -264,10 +264,10 @@ export default function FeedClient({ initialPosts = [] }: { initialPosts?: Post[
           >
             <Sparkles size={64} className="text-[#2a2a2a] mb-6" />
             <h3 className="font-syne font-bold text-2xl mb-2 text-[#F0ECE3]">
-              The Archive Stays Silent
+              Nothing here yet.
             </h3>
-            <p className="font-inter text-[#4A4A4A] max-w-xs mx-auto text-sm leading-relaxed">
-              No confessions found for this segment. Be the shadow that breaks the silence.
+            <p className="font-inter text-[#4A4A4A] max-w-[200px] mx-auto" style={{ fontSize: '13px' }}>
+              Nothing posted here yet. Post first.
             </p>
           </motion.div>
         )}
