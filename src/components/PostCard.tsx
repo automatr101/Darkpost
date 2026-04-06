@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuroraBackground } from '@/components/AuroraBackground';
 import { cn } from '@/lib/utils';
 import type { Post } from '@/lib/types';
-import { Zap, Flame, Play, Pause, Mic, MessageCircle, Bookmark, Share2, Check, Trash2, X } from 'lucide-react';
+import { Zap, Flame, Play, Pause, MessageCircle, Bookmark, Share2, Check, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 
