@@ -15,7 +15,7 @@ import {
   Send,
   Flame,
   MoreHorizontal,
-  X,
+  Trash2,
 } from 'lucide-react';
 import PostCard from '@/components/PostCard';
 import type { Post, Reply } from '@/lib/types';
@@ -299,8 +299,9 @@ export default function PostDetailClient({ params }: { params: { id: string } })
                     <span className="font-inter text-[11px] text-[#353534]">·</span>
                     <span className="font-inter text-[11px] text-[#353534]">{formatDistanceToNow(new Date(reply.created_at))} ago</span>
                     {currentUser?.id === reply.user_id && (
-                      <button onClick={() => handleDeleteReply(reply.id)} className="ml-2 text-red-500 hover:text-red-400 p-1">
-                        <X size={12} />
+                      <button onClick={() => handleDeleteReply(reply.id)} className="ml-auto inline-flex items-center gap-1.5 px-2 py-1 rounded bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all font-syne font-bold text-[10px] uppercase tracking-wider">
+                        <Trash2 size={12} strokeWidth={2.5} />
+                        <span className="hidden sm:inline">Delete</span>
                       </button>
                     )}
                   </div>

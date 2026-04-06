@@ -1,10 +1,9 @@
-import { Metadata, ResolvingMetadata } from 'next';
+import { Metadata } from 'next';
 import { createClient } from '@/utils/supabase/server';
 import PostDetailClient from './PostDetailClient';
 
 export async function generateMetadata(
-  { params }: { params: { id: string } },
-  parent: ResolvingMetadata
+  { params }: { params: { id: string } }
 ): Promise<Metadata> {
   const supabase = createClient();
   const { data: post } = await supabase

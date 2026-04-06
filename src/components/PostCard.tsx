@@ -223,10 +223,11 @@ export default function PostCard({ post, onClick, onDelete, currentUser }: PostC
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.8 }}
                           onClick={initiateDelete}
-                          className="p-1.5 md:p-2 rounded-lg bg-white/5 text-[#888] hover:bg-red-500/10 hover:text-red-500 transition-all border border-transparent hover:border-red-500/20"
+                          className="flex items-center gap-1.5 px-3 py-1.5 md:p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 transition-all border border-red-500/20 hover:border-red-500/40 font-syne font-bold text-[10px] uppercase tracking-wider"
                           title="Delete Post"
                         >
-                          <Trash2 size={13} strokeWidth={2} />
+                          <Trash2 size={14} strokeWidth={2.5} />
+                          <span className="inline md:hidden">Delete</span>
                         </motion.button>
                       ) : deleteStatus === 'confirm' ? (
                         <motion.div

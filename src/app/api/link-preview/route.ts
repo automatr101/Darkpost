@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       url: targetUrl
     });
 
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error processing URL' }, { status: 500 });
   }
 }

@@ -28,7 +28,7 @@ export default function LinkPreview({ url }: { url: string }) {
             setData(preview);
           }
         }
-      } catch (err) {
+      } catch {
         // Silently fail if unable to fetch preview
       } finally {
         if (isMounted) setLoading(false);
