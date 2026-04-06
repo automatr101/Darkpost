@@ -195,7 +195,7 @@ function SettingsContent() {
 
   return (
     <div className="min-h-screen bg-[#131313] text-[#F0ECE3] pb-24 md:pb-12">
-      <header className="sticky top-0 z-30 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 px-4 h-16 flex items-center gap-4">
+      <header className="sticky top-0 z-30 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2 h-auto min-h-[4rem] flex items-center gap-4">
         <Link href="/profile" className="p-2 hover:bg-white/5 rounded-full transition-colors">
           <ArrowLeft size={20} />
         </Link>

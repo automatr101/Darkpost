@@ -11,7 +11,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-[#080808] text-[#F0ECE3]">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-[#080808]/90 backdrop-blur-xl border-b border-white/5 px-6 h-14 flex items-center gap-4">
+      <header className="sticky top-0 z-30 bg-[#080808]/90 backdrop-blur-xl border-b border-white/5 px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-2 h-auto min-h-[3.5rem] flex items-center gap-4">
         <Link href="/" className="p-2 hover:bg-white/5 rounded-full transition-colors">
           <ArrowLeft size={18} />
         </Link>

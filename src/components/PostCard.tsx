@@ -10,6 +10,7 @@ import type { Post } from '@/lib/types';
 import { Zap, Flame, Play, Pause, MessageCircle, Bookmark, Share2, Check, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
+import LinkPreview from './LinkPreview';
 
 interface PostCardProps {
   post: Post;
@@ -250,10 +251,15 @@ export default function PostCard({ post, onClick, onDelete, currentUser }: PostC
 
               {/* Payload: Text */}
               {post.post_type === 'text' && post.content && (
-                <div className="flex-1 pointer-events-none">
-                  <p className="font-dm-serif text-[18px] md:text-[23px] text-[#E0E0E0] md:text-[#ECECEC] leading-relaxed mb-6 italic selection:bg-primary-red/30">
+                <div className="flex-1">
+                  <p className="pointer-events-none font-dm-serif text-[18px] md:text-[23px] text-[#E0E0E0] md:text-[#ECECEC] leading-relaxed mb-6 italic selection:bg-primary-red/30">
                     &ldquo;{post.content}&rdquo;
                   </p>
+                  <div className="pointer-events-auto">
+                    {post.content.match(/(https?:\/\/[^\s]+)/g)?.[0] && (
+                        <LinkPreview url={post.content.match(/(https?:\/\/[^\s]+)/g)![0]} />
+                    )}
+                  </div>
                 </div>
               )}
 

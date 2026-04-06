@@ -80,7 +80,7 @@ export default function ArchiveExplorePage() {
   return (
     <div className="min-h-screen bg-[#131313] text-[#F0ECE3] pb-24 md:pb-12">
       {/* Search Header */}
-      <header className="sticky top-0 z-40 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 px-4 h-16 flex items-center justify-center">
+      <header className="sticky top-0 z-40 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2 h-auto min-h-[4rem] flex items-center justify-center">
         <div className="w-full max-w-2xl flex items-center bg-white/5 border border-white/10 rounded-full px-4 py-2 gap-3 transition-all focus-within:border-[#ff535b]/30">
            <Search size={16} className="text-[#4A4A4A]" />
            <input 
