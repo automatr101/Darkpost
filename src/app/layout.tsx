@@ -24,6 +24,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Darkpost",
   description: "Say what you actually think. Anonymous confessions. Public feed. Screenshot to unlock.",
+  verification: {
+    google: "I-KOXwgatU2rQthV2PXb9sNz7UufNXwwBxsOBOil9D4",
+  },
 };
 
 export default function RootLayout({
